@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>FridjappImpl</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>toolbox.builder.TLAParserBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>toolbox.natures.TLANature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>FridjappImpl.tla</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/FridjappImpl.tla</locationURI>
+		</link>
+		<link>
+			<name>fridjapp.tla</name>
+			<type>1</type>
+			<location>/home/davd33/Code/fridjapp-specs/fridjapp_impl/fridjapp.tla</location>
+		</link>
+	</linkedResources>
+</projectDescription>

@@ -1,0 +1,1 @@
+../fridjapp/fridjapp.tla
