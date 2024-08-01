@@ -3,9 +3,8 @@
 
 # Ignore model checking results
 *.states
-*.cfg
 *.out
-*.launch
+*SnapShot*.launch
 **/*SnapShot*/**
 **/*Model_*/2*/
 
