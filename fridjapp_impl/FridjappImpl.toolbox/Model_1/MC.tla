@@ -8,44 +8,35 @@ banana, orange, kiwi
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-davd, mj, server
+davd, mj
 ----
 
 \* MV CONSTANT definitions INGREDIENT_TYPES
-const_1722271135478475000 == 
+const_1722598287411650000 == 
 {banana, orange, kiwi}
 ----
 
 \* MV CONSTANT definitions USERS
-const_1722271135478476000 == 
-{davd, mj, server}
+const_1722598287411651000 == 
+{davd, mj}
 ----
 
 \* CONSTANT definitions @modelParameterConstants:1MAX_QTTY
-const_1722271135478477000 == 
+const_1722598287411652000 == 
 3
 ----
 
-\* CONSTANT definitions @modelParameterConstants:3SERVER
-const_1722271135478478000 == 
-server
+\* CONSTANT definition @modelParameterDefinitions:0
+def_ov_1722598287411653000 ==
+0..1000
 ----
-
 \* CONSTRAINT definition @modelParameterContraint:0
-constr_1722271135478479000 ==
-/\ \A u \in USERS: nRecipesMade[u] < 3
-/\ \A t \in INGREDIENT_TYPES, u \in USERS: shoppingList[u][t] < 3
-/\ \A t \in INGREDIENT_TYPES, u \in USERS: fridj[u][t] < 3
+constr_1722598287411654000 ==
+/\ \A u \in USERS: \A id \in Ids(u): userData[u][id].cnt < 3
+/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].shop[t] < 3
+/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].frdj[t] < 3
 /\ \A u \in USERS: Len(msgs[u]) < 10
-----
-\* PROPERTY definition @modelCorrectnessProperties:0
-prop_1722271135478481000 ==
-fj!FairSpec
-----
-\* PROPERTY definition @modelCorrectnessProperties:1
-prop_1722271135478482000 ==
-fj!TempInv
 ----
 =============================================================================
 \* Modification History
-\* Created Mon Jul 29 18:38:55 CEST 2024 by davd33
+\* Created Fri Aug 02 13:31:27 CEST 2024 by davd33
