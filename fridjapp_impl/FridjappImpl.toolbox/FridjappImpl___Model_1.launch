@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
+    <stringAttribute key="configurationName" value="Model_1"/>
+    <intAttribute key="distributedFPSetCount" value="0"/>
+    <stringAttribute key="distributedNetworkInterface" value="172.17.0.1"/>
+    <intAttribute key="distributedNodesCount" value="1"/>
+    <stringAttribute key="distributedTLC" value="off"/>
+    <intAttribute key="fpIndex" value="0"/>
+    <intAttribute key="maxHeapSize" value="25"/>
+    <stringAttribute key="modelBehaviorInit" value=""/>
+    <stringAttribute key="modelBehaviorNext" value=""/>
+    <stringAttribute key="modelBehaviorSpec" value="FairSpec"/>
+    <intAttribute key="modelBehaviorSpecType" value="1"/>
+    <stringAttribute key="modelBehaviorVars" value="nRecipesMade, msgs, shoppingList, fridj"/>
+    <stringAttribute key="modelComments" value=""/>
+    <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
+    <listAttribute key="modelCorrectnessInvariants">
+        <listEntry value="1TypeOK"/>
+    </listAttribute>
+    <listAttribute key="modelCorrectnessProperties">
+        <listEntry value="1fj!FairSpec"/>
+        <listEntry value="1fj!TempInv"/>
+        <listEntry value="1TempInv"/>
+    </listAttribute>
+    <intAttribute key="modelEditorOpenTabs" value="10"/>
+    <stringAttribute key="modelExpressionEval" value=""/>
+    <stringAttribute key="modelParameterActionConstraint" value=""/>
+    <listAttribute key="modelParameterConstants">
+        <listEntry value="INGREDIENT_TYPES;;{banana, orange, kiwi};1;0"/>
+        <listEntry value="MAX_QTTY;;3;0;0"/>
+        <listEntry value="USERS;;{davd, mj, server};1;0"/>
+        <listEntry value="SERVER;;server;0;0"/>
+    </listAttribute>
+    <stringAttribute key="modelParameterContraint" value="/\ \A u \in USERS: nRecipesMade[u] &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: shoppingList[u][t] &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: fridj[u][t] &lt; 3&#10;/\ \A u \in USERS: Len(msgs[u]) &lt; 10"/>
+    <listAttribute key="modelParameterDefinitions"/>
+    <stringAttribute key="modelParameterModelValues" value="{}"/>
+    <stringAttribute key="modelParameterNewDefinitions" value=""/>
+    <intAttribute key="modelVersion" value="20191005"/>
+    <intAttribute key="numberOfWorkers" value="6"/>
+    <stringAttribute key="result.mail.address" value=""/>
+    <stringAttribute key="specName" value="FridjappImpl"/>
+    <stringAttribute key="tlcResourcesProfile" value="local custom"/>
+    <listAttribute key="traceExploreExpressions"/>
+</launchConfiguration>
