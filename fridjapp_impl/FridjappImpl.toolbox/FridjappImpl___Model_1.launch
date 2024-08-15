@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.lamport.tla.toolbox.tool.tlc.modelCheck">
+    <stringAttribute key="TLCCmdLineParameters" value=""/>
+    <stringAttribute key="alias" value=""/>
+    <intAttribute key="collectCoverage" value="1"/>
     <stringAttribute key="configurationName" value="Model_1"/>
+    <booleanAttribute key="deferLiveness" value="false"/>
+    <intAttribute key="dfidDepth" value="100"/>
+    <booleanAttribute key="dfidMode" value="false"/>
     <intAttribute key="distributedFPSetCount" value="0"/>
     <stringAttribute key="distributedNetworkInterface" value="172.17.0.1"/>
     <intAttribute key="distributedNodesCount" value="1"/>
     <stringAttribute key="distributedTLC" value="off"/>
-    <intAttribute key="fpIndex" value="71"/>
-    <intAttribute key="maxHeapSize" value="25"/>
+    <stringAttribute key="distributedTLCVMArgs" value=""/>
+    <intAttribute key="fpBits" value="1"/>
+    <intAttribute key="fpIndex" value="33"/>
+    <booleanAttribute key="fpIndexRandom" value="true"/>
+    <intAttribute key="maxHeapSize" value="41"/>
+    <intAttribute key="maxSetSize" value="1000000"/>
+    <booleanAttribute key="mcMode" value="true"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
     <stringAttribute key="modelBehaviorNext" value=""/>
     <stringAttribute key="modelBehaviorSpec" value="FairSpec"/>
@@ -18,17 +29,20 @@
         <listEntry value="1TypeOK"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
-        <listEntry value="1TempInv"/>
+        <listEntry value="0AllUsersMakeRecipes"/>
+        <listEntry value="0UserDataIsSynchronized"/>
+        <listEntry value="0FridjesCreated"/>
     </listAttribute>
-    <intAttribute key="modelEditorOpenTabs" value="10"/>
+    <intAttribute key="modelEditorOpenTabs" value="14"/>
     <stringAttribute key="modelExpressionEval" value=""/>
     <stringAttribute key="modelParameterActionConstraint" value=""/>
     <listAttribute key="modelParameterConstants">
-        <listEntry value="INGREDIENT_TYPES;;{banana, orange, kiwi};1;0"/>
+        <listEntry value="INGREDIENT_TYPES;;{banana};1;0"/>
         <listEntry value="MAX_QTTY;;3;0;0"/>
-        <listEntry value="USERS;;{davd, mj};1;0"/>
+        <listEntry value="USERS;;{davd, mj};1;1"/>
+        <listEntry value="EMPTY;;EMPTY;1;0"/>
     </listAttribute>
-    <stringAttribute key="modelParameterContraint" value="/\ \A u \in USERS: \A id \in Ids(u): userData[u][id].cnt &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].shop[t] &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].frdj[t] &lt; 3&#10;/\ \A u \in USERS: Len(msgs[u]) &lt; 10"/>
+    <stringAttribute key="modelParameterContraint" value="/\ Cardinality(AllIds) &lt; 100&#10;/\ \A u \in USERS: Len(msgs[u]) &lt; 10"/>
     <listAttribute key="modelParameterDefinitions">
         <listEntry value="Nat;;0..1000;0;0"/>
     </listAttribute>
@@ -36,8 +50,16 @@
     <stringAttribute key="modelParameterNewDefinitions" value=""/>
     <intAttribute key="modelVersion" value="20191005"/>
     <intAttribute key="numberOfWorkers" value="6"/>
+    <stringAttribute key="postCondition" value=""/>
+    <booleanAttribute key="recover" value="false"/>
     <stringAttribute key="result.mail.address" value=""/>
+    <intAttribute key="simuAril" value="-1"/>
+    <intAttribute key="simuDepth" value="100"/>
+    <stringAttribute key="simuNumTraces" value="9223372036854775807"/>
+    <intAttribute key="simuSeed" value="-1"/>
     <stringAttribute key="specName" value="FridjappImpl"/>
     <stringAttribute key="tlcResourcesProfile" value="local custom"/>
     <listAttribute key="traceExploreExpressions"/>
+    <stringAttribute key="view" value=""/>
+    <booleanAttribute key="visualizeStateGraph" value="false"/>
 </launchConfiguration>
