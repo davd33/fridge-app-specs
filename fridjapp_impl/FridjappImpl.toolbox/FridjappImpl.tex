@@ -939,238 +939,337 @@
 \begin{document}
 \tlatex
 \setboolean{shading}{true}
-\@x{}\moduleLeftDash\@xx{ {\MODULE} FridjappImpl}\moduleRightDash\@xx{}%
-\@pvspace{8.0pt}%
-\@x{ {\EXTENDS} Integers ,\, FiniteSets ,\, Sequences}%
-\@pvspace{8.0pt}%
-\@x{ {\CONSTANTS} INGREDIENT\_TYPES ,\, MAX\_QTTY ,\, USERS ,\, SERVER}%
-\@pvspace{8.0pt}%
-\@x{ {\ASSUME} SERVER \.{\in} USERS}%
-\@pvspace{8.0pt}%
-\@x{ {\VARIABLES} fridj ,\, shoppingList ,\, nRecipesMade ,\, msgs}%
-\@pvspace{8.0pt}%
-\@x{ PT \.{\defeq} {\INSTANCE} PT}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Sum up all integers in function FUN.
-\end{cpar}%
-\end{lcom}%
- \@x{ Sum ( fun ) \.{\defeq} PT {\bang} ReduceSet ( {\LAMBDA} k ,\, acc \.{:}
- acc \.{+} fun [ k ] ,\,}%
-\@x{\@s{129.68} {\DOMAIN} fun ,\, 0 )}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Refinement mapping: the number of recipes split by users is summed up.
- The \ensuremath{fridj} of reference is the server\mbox{'}s.
-\end{cpar}%
-\end{lcom}%
- \@x{ fj \.{\defeq} {\INSTANCE} fridjapp {\WITH} nRecipesMade \.{\leftarrow}
- Sum ( nRecipesMade ) ,\,}%
-\@x{\@s{138.44} fridj \.{\leftarrow} fridj [ SERVER ]}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-What\mbox{'}s a \ensuremath{Fridj} and a Shopping List.
-\end{cpar}%
-\end{lcom}%
-\@x{ AllFridjes \.{\defeq} [ INGREDIENT\_TYPES \.{\rightarrow} Nat ]}%
-\@x{ AllShoppingLists \.{\defeq} AllFridjes}%
-\@pvspace{8.0pt}%
-\@x{ FinalUsers \.{\defeq} USERS \.{\,\backslash\,} \{ SERVER \}}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-What\mbox{'}s a synchronisation message, and it\mbox{'}s actions.
-\end{cpar}%
-\end{lcom}%
-\@x{ AddAction \.{\defeq}\@w{add}}%
-\@x{ RmAction \.{\defeq}\@w{rm}}%
-\@x{ Actions \.{\defeq} \{ AddAction ,\, RmAction \}}%
-\@x{ FridjObject \.{\defeq}\@w{fridj}}%
-\@x{ ShoppingListObject \.{\defeq}\@w{shoppingList}}%
-\@x{ Objects \.{\defeq} \{ FridjObject ,\, ShoppingListObject \}}%
-\@x{ Messages \.{\defeq} [ user \.{:} FinalUsers ,\,}%
-\@x{\@s{62.63} action \.{:} Actions ,\,}%
-\@x{\@s{62.63} object\@s{1.86} \.{:} Objects ,\,}%
-\@x{\@s{62.63} value \.{:} AllFridjes ]}%
-\@pvspace{8.0pt}%
-\@x{ TypeOK \.{\defeq}}%
-\begin{lcom}{16.4}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Every user\mbox{'}s device is assigned a \ensuremath{fridj} function.
- One of these users is the server.
-\end{cpar}%
-\end{lcom}%
-\@x{\@s{16.4} \.{\land} fridj \.{\in} [ USERS \.{\rightarrow} AllFridjes ]}%
-\begin{lcom}{16.4}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Each user has a shopping list as well.
-\end{cpar}%
-\end{lcom}%
- \@x{\@s{16.4} \.{\land} shoppingList \.{\in} [ USERS \.{\rightarrow}
- AllShoppingLists ]}%
-\begin{lcom}{16.4}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-We count the number of recipes made by each user.
-\end{cpar}%
-\end{lcom}%
-\@x{\@s{16.4} \.{\land} nRecipesMade \.{\in} [ USERS \.{\rightarrow} Nat ]}%
-\begin{lcom}{16.4}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
- The sequence of messages sent to \ensuremath{USERS} by
- \ensuremath{Message.user
+\fl{}\moduleLeftDash\cl{ {\MODULE} FridjappImpl}\moduleRightDash\cl{}
+\fl{}
+\fl{ {\EXTENDS} Integers ,\, FiniteSets ,\, Sequences}
+\fl{}
+\fl{ {\CONSTANTS} INGREDIENT\_TYPES ,\, MAX\_QTTY ,\, USERS ,\, EMPTY}
+\fl{}
+\fl{ {\VARIABLES} userData ,\, msgs}
+\fl{}
+\fl{ PT \.{\defeq} {\INSTANCE} PT}
+\fl{}
+\fl{}
+\fl{}\al{11}{0}{}
+\fl{}\al{12}{0}{}
+ \fl{ Sum ( fun ) \.{\defeq} PT {\bang} ReduceSet (}\al{13}{9}{ {\LAMBDA} k
+ ,\, acc \.{:} acc \.{+} fun [ k ] ,\,}
+\fl{ {\DOMAIN} fun ,\, 0 )}
+\fl{}
+\fl{}
+\fl{}\al{17}{0}{}
+\fl{}\al{18}{0}{}
+\fl{ SHOP}\al{19}{1}{ \.{\defeq}}\al{19}{2}{\@w{shop}}\al{19}{3}{%
+\@y{\@s{0}%
+ shopping list
 }%
-\end{cpar}%
-\end{lcom}%
- \@x{\@s{16.4} \.{\land} msgs \.{\in} [ USERS \.{\rightarrow} Seq ( Messages )
- ]}%
-\@pvspace{8.0pt}%
- \@x{ vars \.{\defeq} {\langle} fridj ,\, shoppingList ,\, nRecipesMade
- {\rangle}}%
-\@pvspace{8.0pt}%
-\@x{ Min ( a ,\, b ) \.{\defeq} {\IF} a \.{<} b \.{\THEN} a \.{\ELSE} b}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Definitions for creating messages.
-\end{cpar}%
-\end{lcom}%
-\@x{ NewMessage ( user ,\, action ,\, object ,\, value ) \.{\defeq}}%
-\@x{\@s{16.4} [ user \.{\mapsto} user ,\,}%
-\@x{\@s{19.17} action \.{\mapsto} action ,\,}%
-\@x{\@s{19.17} object\@s{1.86} \.{\mapsto} object ,\,}%
-\@x{\@s{19.17} value \.{\mapsto} value ]}%
-\@pvspace{8.0pt}%
-\@x{ AddToShoppingListMsg ( user ,\, value ) \.{\defeq}}%
- \@x{\@s{16.4} NewMessage ( user ,\, AddAction ,\, ShoppingListObject ,\,
- value )}%
-\@pvspace{8.0pt}%
-\@x{ RmFromShoppingListMsg ( user ,\, value ) \.{\defeq}}%
- \@x{\@s{16.4} NewMessage ( user ,\, RmAction ,\, ShoppingListObject ,\, value
- )}%
-\@pvspace{8.0pt}%
-\@x{ AddToFridjMsg ( user ,\, value ) \.{\defeq}}%
-\@x{\@s{16.4} NewMessage ( user ,\, AddAction ,\, FridjObject ,\, value )}%
-\@pvspace{8.0pt}%
-\@x{ RmFromFridjMsg ( user ,\, value ) \.{\defeq}}%
-\@x{\@s{16.4} NewMessage ( user ,\, RmAction ,\, FridjObject ,\, value )}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
- Send messages, that is the value of the \mbox{'}msgs\mbox{'} variable in the
- second
- state of a step.
-\end{cpar}%
-\end{lcom}%
-\@x{ Send ( to ,\, new\_msgs ) \.{\defeq}}%
- \@x{\@s{21.98} msgs \.{'} \.{=} [ msgs {\EXCEPT} {\bang} [ to ] \.{=} @
- \.{\circ} new\_msgs ]}%
-\@pvspace{8.0pt}%
-\@x{ NotifyServer ( messages ) \.{\defeq}}%
-\@x{\@s{16.4} Send ( SERVER ,\, messages )}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Actions taken by users.
- The first is when users add items in the shopping list.
-\end{cpar}%
-\end{lcom}%
-\@x{ AddToShoppingList ( user ) \.{\defeq}}%
- \@x{\@s{16.4} \E\, t \.{\in} INGREDIENT\_TYPES ,\, n \.{\in} 1 \.{\dotdot}
- MAX\_QTTY \.{:}}%
- \@x{\@s{27.72} \.{\LET} new\_shopping\_list \.{\defeq} [ shoppingList
- {\EXCEPT} {\bang} [ t ] \.{=} @ \.{+} n ]}%
- \@x{\@s{27.72} \.{\IN} \.{\land} shoppingList \.{'} \.{=}
- new\_shopping\_list}%
- \@x{\@s{48.12} \.{\land} NotifyServer ( {\langle} AddToShoppingListMsg ( user
- ,\, new\_shopping\_list ) {\rangle} )}%
- \@x{\@s{48.12} \.{\land} {\UNCHANGED} {\langle} fridj ,\, nRecipesMade
- {\rangle}}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Next, users add bought items in their \ensuremath{fridj} instance.
-\end{cpar}%
-\end{lcom}%
-\@x{ BuyIngredients ( user ) \.{\defeq}}%
-\@x{\@s{16.4} \E\, t \.{\in} INGREDIENT\_TYPES \.{:}}%
- \@x{\@s{27.72} \.{\LET} bought\_n \.{\defeq} Min ( MAX\_QTTY \.{-} fridj [ t
- ] ,\, shoppingList [ t ] )}%
- \@x{\@s{48.12} new\_shopping\_list \.{\defeq} [ shoppingList {\EXCEPT}
- {\bang} [ t ] \.{=} @ \.{-} bought\_n ]}%
- \@x{\@s{48.12} new\_fridj \.{\defeq} [ fridj {\EXCEPT} {\bang} [ t ] \.{=} @
- \.{+} bought\_n ]}%
-\@x{\@s{27.72} \.{\IN} \.{\land} bought\_n \.{>} 0}%
-\@x{\@s{48.12} \.{\land} shoppingList \.{'} \.{=} new\_shopping\_list}%
-\@x{\@s{48.12} \.{\land} fridj \.{'} \.{=} new\_fridj}%
- \@x{\@s{48.12} \.{\land} NotifyServer ( {\langle} RmFromShoppingListMsg (
- user ,\, new\_shopping\_list ) ,\,}%
-\@x{\@s{122.79} AddToFridjMsg ( user ,\, new\_fridj ) {\rangle} )}%
-\@x{\@s{48.12} \.{\land} {\UNCHANGED} {\langle} nRecipesMade {\rangle}}%
-\@pvspace{8.0pt}%
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-Finally, users cook! They remove items from the \ensuremath{fridj}.
-\end{cpar}%
-\end{lcom}%
-\@x{ MakeRecipe ( user ) \.{\defeq}}%
-\@x{\@s{16.4} \E\, r \.{\in} fj {\bang} AllRecipes \.{:}}%
- \@x{\@s{27.72} \.{\LET} new\_fridj \.{\defeq} [ t \.{\in} {\DOMAIN} fridj
- \.{\mapsto} fridj [ t ] \.{-} r [ t ] ]}%
- \@x{\@s{27.72} \.{\land} \A\, t \.{\in} {\DOMAIN} r \.{:} fridj [ t ]
- \.{\geq} r [ t ]}%
-\@x{\@s{27.72} \.{\land} fridj \.{'} \.{=} new\_fridj}%
- \@x{\@s{27.72} \.{\land} nRecipesMade \.{'} \.{=} [ nRecipesMade {\EXCEPT}
- {\bang} [ user ] \.{=} @ \.{+} 1 ]}%
- \@x{\@s{27.72} \.{\land} NotifyServer ( {\langle} RmFromFridjMsg ( user ,\,
- new\_fridj ) {\rangle} )}%
-\@x{\@s{27.72} \.{\land} {\UNCHANGED} shoppingList}%
-\@pvspace{8.0pt}%
-\@x{ Next \.{\defeq} \E\, u \.{\in} FinalUsers \.{:}}%
-\@x{\@s{16.4} \.{\lor} AddToShoppingList ( u )}%
-\@x{\@s{16.4} \.{\lor} BuyIngredients ( u )}%
-\@x{\@s{16.4} \.{\lor} MakeRecipe ( u )}%
-\@pvspace{8.0pt}%
-\@x{ Init \.{\defeq}}%
- \@x{\@s{16.4} \.{\land} fridj \.{=} [ t \.{\in} INGREDIENT\_TYPES \.{\mapsto}
- 0 ]}%
- \@x{\@s{16.4} \.{\land} shoppingList\@s{6.46} \.{=} [ t\@s{1.86} \.{\in}
- INGREDIENT\_TYPES \.{\mapsto} 0 ]}%
-\@x{\@s{16.4} \.{\land} nRecipesMade \.{=} [ u \.{\in} USERS \.{\mapsto} 0 ]}%
- \@x{\@s{16.4} \.{\land} msgs \.{=} [ u \.{\in} USERS \.{\mapsto} {\langle}
- {\rangle} ]}%
-\@pvspace{8.0pt}%
-\@x{ Spec \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ vars}}%
-\@x{ FairSpec \.{\defeq}}%
-\@x{\@s{16.4} \.{\land} Spec}%
- \@x{\@s{16.4} \.{\land} \A\, u \.{\in} USERS \.{:} \.{\land} {\WF}_{ vars} (
- BuyIngredients ( u ) )}%
-\@x{\@s{96.48} \.{\land} {\WF}_{ vars} ( MakeRecipe ( u ) )}%
-\@x{\@s{96.48} \.{\land} {\WF}_{ vars} ( AddToShoppingList ( u ) )}%
-\@pvspace{8.0pt}%
-\@x{ {\THEOREM} Spec \.{\implies} fj {\bang} Spec}%
-\@x{ {\THEOREM} FairSpec \.{\implies} fj {\bang} FairSpec}%
-\@pvspace{8.0pt}%
- \@x{ TempInv \.{\defeq} {\Diamond} ( \A\, u \.{\in} USERS \.{:} nRecipesMade
- [ u ] \.{>} 0 )}%
-\@pvspace{8.0pt}%
-\@x{}\bottombar\@xx{}%
-\setboolean{shading}{false}
-\begin{lcom}{0}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
-\ensuremath{\.{\,\backslash\,}}* Modification History
-\end{cpar}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
- \ensuremath{\.{\,\backslash\,}}* Last modified \ensuremath{Mon}
- \ensuremath{Jul} 29 17:09:38 \ensuremath{CEST} 2024 by \ensuremath{davd33
+}
+\fl{ FRDJ}\al{20}{1}{ \.{\defeq}}\al{20}{2}{\@w{frdj}}\al{20}{3}{%
+\@y{\@s{0}%
+ fridj
 }%
-\end{cpar}%
-\begin{cpar}{0}{F}{F}{0}{0}{}%
- \ensuremath{\.{\,\backslash\,}}* Created \ensuremath{Thu} \ensuremath{Jul} 25
- 23:17:45 \ensuremath{CEST} 2024 by \ensuremath{davd33
+}
+\fl{}
+\fl{}
+\fl{}\al{23}{0}{}
+\fl{}\al{24}{0}{}
+\fl{}\al{25}{0}{}
+\fl{ UserData ( data ) \.{\defeq}}
+\fl{ \.{\land}}\al{27}{1}{ {\DOMAIN} data \.{=} USERS}
+\fl{ \.{\land}}\al{28}{1}{ \A\, u \.{\in} {\DOMAIN} data \.{:}}
+\fl{ \.{\lor}}\al{29}{1}{ data [ u ] \.{=} EMPTY}
+ \fl{ \.{\lor}}\al{30}{1}{ \.{\land}}\al{30}{2}{ {\DOMAIN} data [ u ]
+ \.{\subseteq} Nat}
+\fl{ \.{\land}}\al{31}{1}{ \A\, f \.{\in} {\DOMAIN} data [ u ] \.{:}}
+ \fl{ data [ u ] [ f ] \.{\in} [}\al{32}{9}{ frdj}\al{32}{10}{
+ \.{:}}\al{32}{11}{ [ INGREDIENT\_TYPES}\al{32}{13}{
+ \.{\rightarrow}}\al{32}{14}{ Nat ] ,\,}
+ \fl{ shop}\al{33}{1}{ \.{:}}\al{33}{2}{ [ INGREDIENT\_TYPES}\al{33}{4}{
+ \.{\rightarrow}}\al{33}{5}{ Nat ] ,\,}
+\fl{ cnt \.{:} Nat ,\,}
+\fl{ sync \.{:} {\SUBSET} USERS ,\,}
+\fl{ owner \.{:} USERS ]}
+\fl{}
+\fl{}
+\fl{}\al{39}{0}{}
+\fl{}\al{40}{0}{}
+\fl{}\al{41}{0}{}
+\fl{}\al{42}{0}{}
+\fl{ Msgs}\al{43}{1}{ ( messages ) \.{\defeq}}
+\fl{ \.{\land}}\al{44}{1}{ {\DOMAIN} messages \.{=} USERS}
+\fl{ \.{\land}}\al{45}{1}{ \A\, u \.{\in} {\DOMAIN} messages \.{:}}
+\fl{ \.{\lor}}\al{46}{1}{ messages [ u ] \.{=} {\langle} {\rangle}}
+ \fl{ \.{\lor}}\al{47}{1}{ PT {\bang} ReduceSeq (}\al{47}{5}{ {\LAMBDA} m ,\,
+ acc \.{:}}
+\fl{ \.{\land}}\al{48}{1}{ acc}
+ \fl{ \.{\land}}\al{49}{1}{ m \.{\in} [}\al{49}{4}{ user}\al{49}{5}{
+ \.{:}}\al{49}{6}{ USERS ,\,}
+\fl{ type}\al{50}{1}{ \.{:}}\al{50}{2}{ \{ FRDJ ,\, SHOP \} ,\,}
+\fl{ frdjId \.{:} Nat ,\,}
+\fl{ val \.{:} [ INGREDIENT\_TYPES \.{\rightarrow} Nat ] ] ,\,}
+\fl{ messages [ u ] ,\, {\TRUE} )}
+\fl{}
+\fl{}
+\fl{}\al{56}{0}{}
+\fl{}\al{57}{0}{}
+\fl{ TypeOK}\al{58}{1}{ \.{\defeq}}
+\fl{ \.{\land}}\al{59}{1}{ UserData ( userData )}
+\fl{ \.{\land}}\al{60}{1}{ Msgs ( msgs )}
+\fl{}
+\fl{}
+\fl{}\al{63}{0}{}
+\fl{}\al{64}{0}{}
+\fl{ vars \.{\defeq} {\langle} userData ,\, msgs {\rangle}}
+\fl{}
+\fl{}
+\fl{}\al{68}{0}{}
+\fl{}\al{69}{0}{}
+\fl{ Msg (}\al{70}{2}{ user ,\, type ,\, frdjId ,\, new\_val ) \.{\defeq}}
+\fl{ [}\al{71}{1}{ user}\al{71}{2}{ \.{\mapsto}}\al{71}{3}{ user ,\,}
+\fl{ type}\al{72}{1}{ \.{\mapsto}}\al{72}{2}{ type ,\,}
+\fl{ frdjId \.{\mapsto} frdjId ,\,}
+\fl{ val \.{\mapsto} new\_val ]}
+\fl{}
+\fl{}
+\fl{}\al{77}{0}{}
+\fl{}\al{78}{0}{}
+\fl{ Send}\al{79}{1}{ ( from ,\, new\_msgs ) \.{\defeq}}
+ \fl{ msgs \.{'} \.{=} [ msgs {\EXCEPT} {\bang} [ from ] \.{=} @ \.{\circ}
+ new\_msgs ]}
+\fl{}
+\fl{}
+\fl{}\al{83}{0}{}
+\fl{}\al{84}{0}{}
+ \fl{ AllIds \.{\defeq} PT {\bang} ReduceSet (}\al{85}{6}{ {\LAMBDA} u ,\, a
+ \.{:}}
+\fl{ {\IF} userData [ u ] \.{=} EMPTY}
+\fl{ \.{\THEN} a}
+\fl{ \.{\ELSE} a \.{\cup} {\DOMAIN} userData [ u ] ,\,}
+\fl{ USERS ,\, \{ \} )}
+\fl{ Ids ( user ) \.{\defeq}}\al{90}{5}{ {\IF} userData [ user ] \.{=} EMPTY}
+\fl{ \.{\THEN} \{ \}}
+\fl{ \.{\ELSE} {\DOMAIN} userData [ user ]}
+\fl{}
+\fl{}
+\fl{}\al{95}{0}{}
+\fl{}\al{96}{0}{}
+\fl{}\al{97}{0}{}
+ \fl{ NewFridj ( user ) \.{\defeq} [}\al{98}{6}{ frdj}\al{98}{7}{
+ \.{\mapsto}}\al{98}{8}{ [ t}\al{98}{10}{ \.{\in}}\al{98}{11}{
+ INGREDIENT\_TYPES}\al{98}{12}{ \.{\mapsto}}\al{98}{13}{ 0 ] ,\,}
+ \fl{ shop}\al{99}{1}{ \.{\mapsto}}\al{99}{2}{ [ t}\al{99}{4}{
+ \.{\in}}\al{99}{5}{ INGREDIENT\_TYPES}\al{99}{6}{ \.{\mapsto}}\al{99}{7}{ 0
+ ] ,\,}
+\fl{ cnt \.{\mapsto} 0 ,\,}
+\fl{ owner \.{\mapsto} user ,\,}
+\fl{ sync \.{\mapsto} \{ \} ]}
+\fl{}
+ \fl{ AddFridj ( user ,\, id ,\, frdjData ) \.{\defeq} [}\al{104}{10}{ x
+ \.{\in} Ids ( user ) \.{\cup} \{ id \} \.{\mapsto}}
+\fl{ {\IF} x \.{=} id}
+\fl{ \.{\THEN} frdjData}
+\fl{ \.{\ELSE} userData [ user ] [ x ] ]}
+\fl{}
+\fl{ CreateFridj ( user ) \.{\defeq}}
+ \fl{ \.{\land}}\al{110}{1}{ \E\,}\al{110}{2}{ id \.{\in} Nat
+ \.{\,\backslash\,} AllIds \.{:}}
+ \fl{ userData \.{'} \.{=} [ userData {\EXCEPT} {\bang} [ user ] \.{=}
+ AddFridj ( user ,\, id ,\, NewFridj ( user ) ) ]}
+\fl{ \.{\land}}\al{112}{1}{ {\UNCHANGED} msgs}
+\fl{}
+\fl{ DeleteFridj ( user ) \.{\defeq} \E\, id \.{\in} Ids ( user ) \.{:}}
+\fl{ \.{\land}}\al{115}{1}{ userData [ user ] [ id ] . owner \.{=} user}
+ \fl{ \.{\land}}\al{116}{1}{ userData \.{'} \.{=} [ userData {\EXCEPT} {\bang}
+ [ user ] \.{=} [ x \.{\in} Ids ( user ) \.{\,\backslash\,} \{ id \}
+ \.{\mapsto} @ [ x ] ] ]}
+\fl{ \.{\land}}\al{117}{1}{ {\UNCHANGED} msgs}
+\fl{}
+ \fl{ Subscribe ( user ) \.{\defeq} \E\, u \.{\in} USERS \.{\,\backslash\,} \{
+ user \} \.{:} \E\, id \.{\in} Ids ( u ) \.{:}}
+\fl{ \.{\land}}\al{120}{1}{ userData [ u ] [ id ] . owner \.{=} u}
+ \fl{ \.{\land}}\al{121}{1}{ userData \.{'} \.{=} [ userData
+ {\EXCEPT}}\al{121}{7}{ {\bang}}\al{121}{8}{ [ u ] [ id ] . sync \.{=} @
+ \.{\cup} \{ user \} ,\,}
+ \fl{ {\bang}}\al{122}{1}{ [ user ] \.{=} AddFridj ( user ,\, id ,\, userData
+ [ u ] [ id ] ) ]}
+\fl{ \.{\land}}\al{123}{1}{ {\UNCHANGED} msgs}
+\fl{}
+\fl{ Unsubscribe ( user ) \.{\defeq} \E\, id \.{\in} Ids ( user ) \.{:}}
+\fl{ \.{\land}}\al{126}{1}{ userData [ user ] [ id ] . owner \.{\neq} user}
+ \fl{ \.{\land}}\al{127}{1}{ userData \.{'} \.{=} [ u}\al{127}{6}{ \.{\in}
+ USERS \.{\mapsto}}
+\fl{ {\IF} u \.{=} user}
+ \fl{ \.{\THEN} [ uid}\al{129}{3}{ \.{\in}}\al{129}{4}{ Ids ( u )
+ \.{\,\backslash\,} \{ id \}}\al{129}{12}{ \.{\mapsto} userData [ u ] [ uid ]
+ ]}
+ \fl{ \.{\ELSE} [}\al{130}{2}{ uid}\al{130}{3}{ \.{\in}}\al{130}{4}{ Ids ( u
+ )}\al{130}{8}{ \.{\mapsto}}
+\fl{ [}\al{131}{1}{ userData [ u ] [ uid ] {\EXCEPT} {\bang} . sync \.{=}}
+ \fl{ {\IF} uid \.{=} id}\al{132}{4}{ \.{\THEN} @ \.{\,\backslash\,} \{ user
+ \}}
+\fl{ \.{\ELSE} @ ] ] ]}
+\fl{ \.{\land}}\al{134}{1}{ {\UNCHANGED} msgs}
+\fl{}
+\fl{}
+\fl{}\al{137}{0}{}
+\fl{}\al{138}{0}{}
+\fl{ AddToShoppingList ( user ) \.{\defeq}}
+ \fl{ \E\,}\al{140}{1}{ t \.{\in} INGREDIENT\_TYPES ,\, id \.{\in} Ids ( user
+ ) \.{:}}
+\fl{}
+ \fl{ \.{\LET} \_userData \.{\defeq} [ userData {\EXCEPT} {\bang} [ user ] [
+ id ] . shop [ t ] \.{=} @ \.{+} 1 ]}
+ \fl{ \.{\IN}}\al{143}{1}{ \.{\land}}\al{143}{2}{ userData \.{'} \.{=}
+ \_userData}
+ \fl{ \.{\land}}\al{144}{1}{ Send ( user ,\, {\langle} Msg ( user ,\, SHOP ,\,
+ id ,\, \_userData [ user ] [ id ] . shop ) {\rangle} )%
+\@y{\@s{0}%
+ \ensuremath{TODO} must send to subcribed users
 }%
-\end{cpar}%
-\end{lcom}%
+}
+\fl{}
+\fl{}
+\fl{}\al{147}{0}{}
+\fl{}\al{148}{0}{}
+\fl{ BuyIngredients ( user ) \.{\defeq}}
+ \fl{ \E\,}\al{150}{1}{ t \.{\in} INGREDIENT\_TYPES ,\, id \.{\in} Ids ( user
+ ) \.{:}}
+\fl{}
+\fl{ \.{\LET}}\al{152}{1}{ data \.{\defeq} userData [ user ] [ id ]}
+\fl{}
+ \fl{ bought\_n \.{\defeq} PT {\bang} Min ( MAX\_QTTY \.{-} data . frdj [ t ]
+ ,\, data . shop [ t ] )}
+ \fl{ \_userData \.{\defeq} [ userData {\EXCEPT}}\al{155}{5}{
+ {\bang}}\al{155}{6}{ [ user ] [ id ] . shop [ t ]}\al{155}{17}{
+ \.{=}}\al{155}{18}{ @}\al{155}{19}{ \.{-}}\al{155}{20}{ bought\_n ,\,}
+ \fl{ {\bang}}\al{156}{1}{ [ user ] [ id ] . frdj [ t ]}\al{156}{12}{
+ \.{=}}\al{156}{13}{ @}\al{156}{14}{ \.{+}}\al{156}{15}{ bought\_n ]}
+\fl{ \.{\IN}}\al{157}{1}{ \.{\land}}\al{157}{2}{ bought\_n \.{>} 0}
+\fl{ \.{\land}}\al{158}{1}{ userData \.{'} \.{=} \_userData}
+ \fl{ \.{\land}}\al{159}{1}{ Send ( user ,\, {\langle}}\al{159}{6}{ Msg ( user
+ ,\, SHOP ,\, id ,\, \_userData [ user ] [ id ] . shop ) ,\,}
+ \fl{ Msg ( user ,\, FRDJ ,\, id ,\, \_userData [ user ] [ id ] . frdj )
+ {\rangle} )%
+\@y{\@s{0}%
+ \ensuremath{TODO} must send to subcribed users
+}%
+}
+\fl{}
+\fl{}
+\fl{}\al{163}{0}{}
+\fl{}\al{164}{0}{}
+\fl{ AllRecipes \.{\defeq}}
+ \fl{ [ INGREDIENT\_TYPES \.{\rightarrow} 0 \.{\dotdot} MAX\_QTTY ]
+ \.{\,\backslash\,} \{ [ t \.{\in} INGREDIENT\_TYPES \.{\mapsto} 0 ] \}}
+\fl{}
+\fl{ MakeRecipe ( user ) \.{\defeq}}
+\fl{ \E\,}\al{169}{1}{ r \.{\in} AllRecipes ,\, id \.{\in} Ids ( user ) \.{:}}
+ \fl{ \.{\LET} \_userData \.{\defeq} [ userData {\EXCEPT}}\al{170}{6}{
+ {\bang}}\al{170}{7}{ [ user ] [ id ] . frdj \.{=} [ t \.{\in} {\DOMAIN} @
+ \.{\mapsto} @ [ t ] \.{-} r [ t ] ] ,\,}
+\fl{ {\bang}}\al{171}{1}{ [ user ] [ id ] . cnt \.{=} @ \.{+} 1 ]}
+ \fl{ \.{\IN}}\al{172}{1}{ \.{\land}}\al{172}{2}{ \A\, t \.{\in} {\DOMAIN} r
+ \.{:} userData [ user ] [ id ] . frdj [ t ] \.{\geq} r [ t ]}
+\fl{ \.{\land}}\al{173}{1}{ userData \.{'} \.{=} \_userData}
+ \fl{ \.{\land}}\al{174}{1}{ Send ( user ,\, {\langle} Msg ( user ,\, FRDJ ,\,
+ id ,\, \_userData [ user ] [ id ] . frdj ) {\rangle} )%
+\@y{\@s{0}%
+ \ensuremath{TODO} must send to subcribed users
+}%
+}
+\fl{}
+\fl{ RcvMsg ( user ) \.{\defeq}}
+\fl{ \.{\land}}\al{177}{1}{ msgs [ user ] \.{\neq} {\langle} {\rangle}}
+\fl{ \.{\land}}\al{178}{1}{ \.{\LET} msg \.{\defeq} Head ( msgs [ user ] )}
+ \fl{ \.{\IN} userData \.{'} \.{=}}\al{179}{4}{ {\CASE}}\al{179}{5}{ msg .
+ type}\al{179}{8}{ \.{=}}\al{179}{9}{ FRDJ}\al{179}{10}{
+ \.{\rightarrow}}\al{179}{11}{ [ userData {\EXCEPT} {\bang} [ user ] [ msg .
+ frdjId ] . frdj}\al{179}{25}{ \.{=}}\al{179}{26}{ msg . val ]}
+ \fl{ {\Box}}\al{180}{1}{ msg . type}\al{180}{4}{ \.{=}}\al{180}{5}{
+ SHOP}\al{180}{6}{ \.{\rightarrow}}\al{180}{7}{ [ userData {\EXCEPT} {\bang}
+ [ user ] [ msg . frdjId ] . shop}\al{180}{21}{ \.{=}}\al{180}{22}{ msg . val
+ ]}
+ \fl{ \.{\land}}\al{181}{1}{ msgs \.{'} \.{=} [ msgs {\EXCEPT} {\bang} [ user
+ ]}\al{181}{11}{ \.{=} Tail ( @ ) ]}
+\fl{}
+\fl{}
+\fl{}\al{184}{0}{}
+\fl{}\al{185}{0}{}
+\fl{ Next \.{\defeq}}
+\fl{ \E\,}\al{187}{1}{ u \.{\in} USERS \.{:}}
+\fl{ \.{\lor}}\al{188}{1}{ Unsubscribe ( u )}
+\fl{ \.{\lor}}\al{189}{1}{ AddToShoppingList ( u )}
+\fl{ \.{\lor}}\al{190}{1}{ BuyIngredients ( u )}
+\fl{ \.{\lor}}\al{191}{1}{ MakeRecipe ( u )}
+\fl{ \.{\lor}}\al{192}{1}{ RcvMsg ( u )}
+\fl{ \.{\lor}}\al{193}{1}{ CreateFridj ( u )}
+\fl{ \.{\lor}}\al{194}{1}{ DeleteFridj ( u )}
+\fl{ \.{\lor}}\al{195}{1}{ Subscribe ( u )}
+\fl{}
+\fl{ Init \.{\defeq}}
+ \fl{ \.{\land}}\al{198}{1}{ userData \.{=} [ u \.{\in} USERS \.{\mapsto}
+ EMPTY ]}
+ \fl{ \.{\land}}\al{199}{1}{ msgs \.{=} [ u \.{\in} USERS \.{\mapsto}
+ {\langle} {\rangle} ]}
+\fl{}
+\fl{ Spec \.{\defeq} Init \.{\land} {\Box} [ Next ]_{ vars}}
+\fl{}
+\fl{}
+\fl{}\al{204}{0}{}
+\fl{}\al{205}{0}{}
+\fl{ FairSpec \.{\defeq}}
+\fl{ \.{\land}}\al{207}{1}{ Spec}
+ \fl{ \.{\land}}\al{208}{1}{ \A\, u \.{\in} USERS \.{:}}\al{208}{6}{
+ \.{\land}}\al{208}{7}{ {\SF}_{ vars} ( CreateFridj ( u ) )}
+\fl{ \.{\land}}\al{209}{1}{ {\SF}_{ vars} ( DeleteFridj ( u ) )}
+\fl{ \.{\land}}\al{210}{1}{ {\SF}_{ vars} ( Subscribe ( u ) )}
+\fl{ \.{\land}}\al{211}{1}{ {\SF}_{ vars} ( Unsubscribe ( u ) )}
+\fl{ \.{\land}}\al{212}{1}{ {\SF}_{ vars} ( BuyIngredients ( u ) )}
+\fl{ \.{\land}}\al{213}{1}{ {\SF}_{ vars} ( MakeRecipe ( u ) )}
+\fl{ \.{\land}}\al{214}{1}{ {\SF}_{ vars} ( AddToShoppingList ( u ) )}
+\fl{ \.{\land}}\al{215}{1}{ {\SF}_{ vars} ( RcvMsg ( u ) )}
+\fl{}
+\fl{}
+\fl{}\al{218}{0}{}
+\fl{}\al{219}{0}{}
+\fl{}\al{220}{0}{}
+\fl{ NoMsgForUnsubscribedUser \.{\defeq} \A\, u \.{\in} USERS \.{:}}
+ \fl{ PT {\bang} ReduceSeq (}\al{222}{4}{ {\LAMBDA} m ,\, acc \.{:} acc
+ \.{\land} m . frdjId \.{\in} {\DOMAIN} userData [ u ] ,\,}
+\fl{ msgs [ u ] ,\, {\TRUE}%
+\@y{%
+ all messages ref an existing \ensuremath{frdjId
+}}%
+ )}
+\fl{}
+\fl{}
+\fl{}\al{226}{0}{}
+\fl{}\al{227}{0}{}
+ \fl{ AllUsersMakeRecipes \.{\defeq} \A\, u \.{\in} USERS \.{:} {\Diamond} (
+ \A\, id \.{\in} Ids ( u ) \.{:} userData [ u ] [ id ] . cnt \.{>} 0 )}
+ \fl{ FridjesCreated \.{\defeq} \A\, u \.{\in} USERS \.{:} {\Diamond} (
+ userData [ u ] \.{\neq} EMPTY )}
+\fl{ UserDataIsSynchronized \.{\defeq}}
+ \fl{ \.{\land} {\Diamond} ( \E\, u \.{\in} USERS \.{:} msgs [ u ] \.{\neq}
+ {\langle} {\rangle} )}
+\fl{}
+ \fl{ \.{\land} \A\, u \.{\in} USERS \.{:} msgs [ u ] \.{\neq} {\langle}
+ {\rangle} \.{\leadsto} msgs [ u ] \.{=} {\langle} {\rangle}}
+\fl{}
+ \fl{ \.{\land}}\al{235}{1}{ \A\, id \.{\in} AllIds \.{:} \E\, owner \.{\in}
+ USERS \.{:}}
+\fl{ \.{\land}}\al{236}{1}{ userData [ owner ] [ id ] . owner \.{=} owner}
+ \fl{ \.{\land}}\al{237}{1}{ \A\, u \.{\in} USERS \.{\,\backslash\,} \{ owner
+ \} \.{:}}
+\fl{ \.{\land}}\al{238}{1}{ u \.{\in} userData [ owner ] [ id ] . sync}
+ \fl{ \.{\land}}\al{239}{1}{ userData [ u ] [ id ] . frdj}\al{239}{10}{
+ \.{=}}\al{239}{11}{ userData [ owner ] [ id ] . frdj}
+ \fl{ \.{\land}}\al{240}{1}{ userData [ u ] [ id ] . shop}\al{240}{10}{
+ \.{=}}\al{240}{11}{ userData [ owner ] [ id ] . shop}
+\fl{}
+\fl{}\bottombar\cl{}
+\fl{}
+\fl{}
+\fl{}
+\fl{}
 \end{document}

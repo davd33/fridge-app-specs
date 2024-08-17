@@ -29,7 +29,6 @@ ReduceSet(op(_, _), set, acc) ==
          IN op(x, f[s \ {x}])
   IN f[set]
 
-
 (* FUNCTION STUFF *)
 
 (* 
@@ -37,6 +36,14 @@ Gets the set of all possible values that f maps to.
 essential the "opposite" of DOMAIN. Uses a set comprehension-map.
 *)
 Range(f) == { f[x] : x \in DOMAIN f }
+
+(*
+Sums up every element of a function F, from ZERO, using the 
+given operator OP which takes on two arguments: 
+ - value 
+ - accumulator
+*)
+Sum(op(_, _), f, zero) == ReduceSet(LAMBDA key, acc: op(f[key], acc), DOMAIN f, 0)
 
 (*
 Places an ARBITRARY ordering on the set. Which ordering you get is implementation-dependent
@@ -58,6 +65,12 @@ SeqOf(set, n) == UNION {TupleOf(set, m) : m \in 0..n}
 
 ReduceSeq(op(_, _), seq, acc) == 
   ReduceSet(LAMBDA i, a: op(seq[i], a), DOMAIN seq, acc)
+
+ExistsSeq(op(_), seq) ==
+  ReduceSeq(LAMBDA m, acc: acc \/ op(m), seq, FALSE)
+
+ForAllSeq(op(_), seq) ==
+  ReduceSeq(LAMBDA m, acc: acc /\ op(m), seq, TRUE)
 
 (*
   SelectSeq lets you filter a sequence based on a test operator. It acts on the values.

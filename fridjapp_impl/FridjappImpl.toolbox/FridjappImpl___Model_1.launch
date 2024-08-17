@@ -8,14 +8,14 @@
     <intAttribute key="dfidDepth" value="100"/>
     <booleanAttribute key="dfidMode" value="false"/>
     <intAttribute key="distributedFPSetCount" value="0"/>
-    <stringAttribute key="distributedNetworkInterface" value="172.17.0.1"/>
+    <stringAttribute key="distributedNetworkInterface" value="172.20.10.2"/>
     <intAttribute key="distributedNodesCount" value="1"/>
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="33"/>
+    <intAttribute key="fpIndex" value="118"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
-    <intAttribute key="maxHeapSize" value="41"/>
+    <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
     <booleanAttribute key="mcMode" value="true"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
@@ -27,22 +27,19 @@
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
         <listEntry value="1TypeOK"/>
+        <listEntry value="1NoMsgForUnsubscribedUser"/>
     </listAttribute>
-    <listAttribute key="modelCorrectnessProperties">
-        <listEntry value="0AllUsersMakeRecipes"/>
-        <listEntry value="0UserDataIsSynchronized"/>
-        <listEntry value="0FridjesCreated"/>
-    </listAttribute>
+    <listAttribute key="modelCorrectnessProperties"/>
     <intAttribute key="modelEditorOpenTabs" value="14"/>
     <stringAttribute key="modelExpressionEval" value=""/>
     <stringAttribute key="modelParameterActionConstraint" value=""/>
     <listAttribute key="modelParameterConstants">
-        <listEntry value="INGREDIENT_TYPES;;{banana};1;0"/>
+        <listEntry value="INGREDIENT_TYPES;;{banana, orange, kiwi};1;1"/>
         <listEntry value="MAX_QTTY;;3;0;0"/>
         <listEntry value="USERS;;{davd, mj};1;1"/>
         <listEntry value="EMPTY;;EMPTY;1;0"/>
     </listAttribute>
-    <stringAttribute key="modelParameterContraint" value="/\ Cardinality(AllIds) &lt; 100&#10;/\ \A u \in USERS: Len(msgs[u]) &lt; 10"/>
+    <stringAttribute key="modelParameterContraint" value="/\ \A u \in USERS: \A id \in Ids(u): userData[u][id].cnt &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].shop[t] &lt; 3&#10;/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].frdj[t] &lt; 3&#10;/\ \A u \in USERS: Len(msgs[u]) &lt; 10"/>
     <listAttribute key="modelParameterDefinitions">
         <listEntry value="Nat;;0..1000;0;0"/>
     </listAttribute>

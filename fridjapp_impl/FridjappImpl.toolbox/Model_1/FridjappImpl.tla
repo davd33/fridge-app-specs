@@ -1,17 +1,15 @@
 ---------------------------- MODULE FridjappImpl ----------------------------
 
-EXTENDS Integers, FiniteSets, Sequences
+EXTENDS Integers, FiniteSets, Sequences, PT, TLC
 
 CONSTANTS INGREDIENT_TYPES, MAX_QTTY, USERS, EMPTY
 
 VARIABLES userData, msgs
 
-PT == INSTANCE PT
-
 (***************************************************************************)
 (* Sum up all integers in function FUN.                                    *)
 (***************************************************************************)
-Sum(fun) == PT!ReduceSet(LAMBDA k, acc: acc + fun[k],
+Sum(fun) == ReduceSet(LAMBDA k, acc: acc + fun[k],
                          DOMAIN fun, 0)
 
 (***************************************************************************)
@@ -45,13 +43,11 @@ Msgs(messages) ==
     /\ DOMAIN messages = USERS 
     /\ \A u \in DOMAIN messages: 
         \/ messages[u] = <<>>
-        \/ PT!ReduceSeq(LAMBDA m, acc: 
-                         \/ ~ acc
-                         \/ m \in [user: USERS,
-                                   type: {FRDJ, SHOP},
-                                   frdjId: Nat,
-                                   val: [INGREDIENT_TYPES -> Nat]],
-                        messages[u], TRUE)
+        \/ AllMatchSeq(LAMBDA m: m \in [user: USERS,
+                                      type: {FRDJ, SHOP},
+                                      frdjId: Nat,
+                                      val: [INGREDIENT_TYPES -> Nat]],
+                        messages[u])
 
 (***************************************************************************)
 (* Type checking invariant.                                                *)
@@ -65,8 +61,6 @@ TypeOK ==
 (***************************************************************************)
 vars == <<userData, msgs>>
 
-Min(a, b) == IF a < b THEN a ELSE b
-
 (***************************************************************************)
 (* Definitions for creating messages.                                      *)
 (***************************************************************************)
@@ -79,17 +73,19 @@ Msg(user, type, frdjId, new_val) ==
 (***************************************************************************)
 (* Send messages to all users listening for FROM fridj                     *)
 (***************************************************************************)
-Send(from, new_msgs) == 
-    msgs' = [msgs EXCEPT ![from] = @ \o new_msgs]
+Send(to_users, new_msgs) ==
+    msgs' = [u \in USERS |-> IF u \in to_users
+                             THEN msgs[u] \o new_msgs
+                             ELSE msgs[u]]
 
 (***************************************************************************)
 (* Ids are uniq through all the users                                      *)
 (***************************************************************************)
-AllIds == PT!ReduceSet(LAMBDA u, a:
-                            IF userData[u] = EMPTY
-                            THEN a 
-                            ELSE a \union DOMAIN userData[u],
-                       USERS, {})
+AllIds == ReduceSet(LAMBDA u, a:
+                        IF userData[u] = EMPTY
+                        THEN a 
+                        ELSE a \union DOMAIN userData[u],
+                    USERS, {})
 Ids(user) == IF userData[user] = EMPTY
              THEN {}
              ELSE DOMAIN userData[user]
@@ -99,10 +95,10 @@ Ids(user) == IF userData[user] = EMPTY
 (* Create Fridj and shopping list!                                         *)
 (***************************************************************************)
 NewFridj(user) == [frdj |-> [t \in INGREDIENT_TYPES |-> 0],
-                       shop |-> [t \in INGREDIENT_TYPES |-> 0],
-                       cnt |-> 0,
-                       owner |-> user,
-                       sync |-> {}]
+                   shop |-> [t \in INGREDIENT_TYPES |-> 0],
+                   cnt |-> 0,
+                   owner |-> user,
+                   sync |-> {}]
 
 AddFridj(user, id, frdjData) == [x \in Ids(user) \union {id} |-> 
                                   IF x = id
@@ -121,6 +117,7 @@ DeleteFridj(user) == \E id \in Ids(user):
 
 Subscribe(user) == \E u \in USERS \ {user}: \E id \in Ids(u):
     /\ userData[u][id].owner = u
+    /\ userData[user] /= EMPTY => id \notin DOMAIN userData[user]
     /\ userData' = [userData EXCEPT ![u][id].sync = @ \union {user},
                                     ![user] = AddFridj(user, id, userData[u][id])]
     /\ UNCHANGED msgs
@@ -128,12 +125,12 @@ Subscribe(user) == \E u \in USERS \ {user}: \E id \in Ids(u):
 Unsubscribe(user) == \E id \in Ids(user):
     /\ userData[user][id].owner /= user
     /\ userData' = [u \in USERS |->   
-                        IF u = user 
-                        THEN [uid \in Ids(u) \ {id} |-> userData[u][uid]]
-                        ELSE [uid \in Ids(u)        |->
-                                [userData[u][uid] EXCEPT !.sync = 
-                                   IF uid = id THEN @ \ {user}
-                                               ELSE @]]]
+            IF u = user 
+            THEN [uid \in Ids(u) \ {id} |-> userData[u][uid]]
+            ELSE [uid \in Ids(u)        |->
+                    [userData[u][uid] EXCEPT !.sync = 
+                       IF uid = id THEN @ \ {user}
+                                   ELSE @]]]
     /\ UNCHANGED msgs
 
 (***************************************************************************)
@@ -144,7 +141,8 @@ AddToShoppingList(user) ==
         \* update users data with new shopping list
         LET _userData == [userData EXCEPT ![user][id].shop[t] = @ + 1]
         IN /\ userData' = _userData
-           /\ Send(user, <<Msg(user, SHOP, id, _userData[user][id].shop)>>) \* TODO must send to subcribed users
+           /\ Send({u \in USERS: u \in userData[user][id].sync}, 
+                   <<Msg(user, SHOP, id, _userData[user][id].shop)>>)
 
 (***************************************************************************)
 (* Next, users add bought items in their fridj instance.                   *)
@@ -159,8 +157,9 @@ BuyIngredients(user) ==
                                           ![user][id].frdj[t] = @ + bought_n]
         IN /\ bought_n > 0
            /\ userData' = _userData
-           /\ Send(user, <<Msg(user, SHOP, id, _userData[user][id].shop), 
-                           Msg(user, FRDJ, id, _userData[user][id].frdj)>>) \* TODO must send to subcribed users
+           /\ Send({u \in USERS: u \in userData[user][id].sync}, 
+                   <<Msg(user, SHOP, id, _userData[user][id].shop), 
+                     Msg(user, FRDJ, id, _userData[user][id].frdj)>>)
 
 (***************************************************************************)
 (* Finally, users cook! They remove items from the fridj.                  *)
@@ -174,7 +173,8 @@ MakeRecipe(user) ==
                                           ![user][id].cnt = @ + 1]
         IN /\ \A t \in DOMAIN r: userData[user][id].frdj[t] >= r[t]
            /\ userData' = _userData
-           /\ Send(user, <<Msg(user, FRDJ, id, _userData[user][id].frdj)>>) \* TODO must send to subcribed users
+           /\ Send({u \in USERS: u \in userData[user][id].sync}, 
+                   <<Msg(user, FRDJ, id, _userData[user][id].frdj)>>)
 
 RcvMsg(user) == 
     /\ msgs[user] /= <<>>
@@ -188,14 +188,14 @@ RcvMsg(user) ==
 (***************************************************************************)
 Next == 
     \E u \in USERS:  
-        \/ CreateFridj(u)
-        \/ DeleteFridj(u)
-        \/ Subscribe(u)
         \/ Unsubscribe(u)
         \/ AddToShoppingList(u) 
         \/ BuyIngredients(u) 
         \/ MakeRecipe(u)
         \/ RcvMsg(u)
+        \/ CreateFridj(u)
+        \/ DeleteFridj(u)
+        \/ Subscribe(u)
 
 Init == 
     /\ userData = [u \in USERS |-> EMPTY]
@@ -218,6 +218,13 @@ FairSpec ==
                        /\ SF_vars(RcvMsg(u))
 
 (***************************************************************************)
+(* Invariants                                                              *)
+(***************************************************************************)
+\* every user's message reference an existing fridj
+NoMsgForUnsubscribedUser == \A u \in USERS: 
+    AllMatchSeq(LAMBDA m: m.frdjId \in DOMAIN userData[u], msgs[u])
+
+(***************************************************************************)
 (* Compose liveness properties and invariants                              *)
 (***************************************************************************)
 AllUsersMakeRecipes == \A u \in USERS: <>(\A id \in Ids(u): userData[u][id].cnt > 0)
@@ -236,5 +243,6 @@ UserDataIsSynchronized ==
 
 =============================================================================
 \* Modification History
+\* Last modified Thu Aug 15 18:23:59 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33
