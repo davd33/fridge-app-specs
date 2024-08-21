@@ -8,12 +8,14 @@ VARIABLES
     \* user managed frjd list (a fridj and a shopping list 
     userData,
     \* message queue by frjd ID
-    msgs
+    msgs,
+    \* the set messages not acked by everyone yet
+    msgsRcvd
 
 (***************************************************************************)
 (* The list of all the variables in the spec.                              *)
 (***************************************************************************)
-vars == <<userData, msgs>>
+vars == <<userData, msgs, msgsRcvd>>
 
 (***************************************************************************)
 (* Constants                                                               *)
@@ -62,12 +64,15 @@ Msgs(messages) ==
                                       val: [INGREDIENT_TYPES -> Nat]],
                        messages[id])
 
+MsgsRcvd == [Nat(*msg id*) -> USERS]
+
 (***************************************************************************)
 (* Type checking invariant.                                                *)
 (***************************************************************************)
 TypeOK == 
     /\ UserData(userData)   
     /\ Msgs(msgs)
+    /\ msgsRcvd \in MsgsRcvd
 
 (***************************************************************************)
 (* Definitions for creating messages.                                      *)
@@ -238,6 +243,6 @@ UserDataIsSynchronized ==
 
 =============================================================================
 \* Modification History
-\* Last modified Sat Aug 17 13:50:14 CEST 2024 by Davd
+\* Last modified Wed Aug 21 09:28:42 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33
