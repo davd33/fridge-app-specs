@@ -3,7 +3,7 @@ EXTENDS FridjappImpl, TLC
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-banana, orange, kiwi
+banana, orange
 ----
 
 \* MV CONSTANT declarations@modelParameterConstants
@@ -11,37 +11,51 @@ CONSTANTS
 davd, mj
 ----
 
+\* MV CONSTANT declarations@modelParameterConstants
+CONSTANTS
+a, b
+----
+
+\* MV CONSTANT declarations@modelParameterConstants
+CONSTANTS
+d, e
+----
+
 \* MV CONSTANT definitions INGREDIENT_TYPES
-const_1723739047361540000 == 
-{banana, orange, kiwi}
+const_17243997253111174000 == 
+{banana, orange}
 ----
 
 \* MV CONSTANT definitions USERS
-const_1723739047361541000 == 
+const_17243997253111175000 == 
 {davd, mj}
 ----
 
+\* MV CONSTANT definitions FRIDJ_IDS
+const_17243997253111176000 == 
+{a, b}
+----
+
+\* MV CONSTANT definitions MSG_IDS
+const_17243997253111177000 == 
+{d, e}
+----
+
 \* SYMMETRY definition
-symm_1723739047361542000 == 
-Permutations(const_1723739047361540000) \union Permutations(const_1723739047361541000)
+symm_17243997253111178000 == 
+Permutations(const_17243997253111174000) \union Permutations(const_17243997253111175000) \union Permutations(const_17243997253111176000) \union Permutations(const_17243997253111177000)
 ----
 
 \* CONSTANT definitions @modelParameterConstants:1MAX_QTTY
-const_1723739047361543000 == 
+const_17243997253111179000 == 
 3
 ----
 
-\* CONSTANT definition @modelParameterDefinitions:0
-def_ov_1723739047361544000 ==
-0..1000
+\* CONSTANT definitions @modelParameterConstants:6MAX_OP_COUNT
+const_17243997253111180000 == 
+3
 ----
-\* CONSTRAINT definition @modelParameterContraint:0
-constr_1723739047361545000 ==
-/\ \A u \in USERS: \A id \in Ids(u): userData[u][id].cnt < 3
-/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].shop[t] < 3
-/\ \A t \in INGREDIENT_TYPES, u \in USERS: \A id \in Ids(u): userData[u][id].frdj[t] < 3
-/\ \A u \in USERS: Len(msgs[u]) < 10
-----
+
 =============================================================================
 \* Modification History
-\* Created Thu Aug 15 18:24:07 CEST 2024 by Davd
+\* Created Fri Aug 23 09:55:25 CEST 2024 by Davd
