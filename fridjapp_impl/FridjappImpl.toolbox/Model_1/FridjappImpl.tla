@@ -152,6 +152,13 @@ AddFridj(user, id, frdjData) == [x \in Ids(user) \union {id} |->
                                   IF x = id
                                   THEN frdjData
                                   ELSE userData[user][x]]
+UpdateUserData(msg, user, data) ==
+    CASE msg.type = FRDJ  -> [data EXCEPT ![user][msg.frdjId].frdj = msg.val]
+      [] msg.type = SHOP  -> [data EXCEPT ![user][msg.frdjId].shop = msg.val]
+      [] msg.type = CHOWN -> [data EXCEPT ![user][msg.frdjId].owner = msg.val,
+                                          ![user][msg.frdjId].sync  = @ \ {user}]
+      [] msg.type = SUB   -> [data EXCEPT ![user][msg.frdjId].sync = @ \union msg.val]
+      [] msg.type = UNSUB -> [data EXCEPT ![user][msg.frdjId].sync = @ \ msg.val]
 
 CreateFridj(user) ==
     /\ \E id \in FRIDJ_IDS \ AllIds:
@@ -172,9 +179,18 @@ Subscribe(user) == \E u \in USERS \ {user}: \E queueId \in Ids(u), msgId \in MSG
     /\ userData[u][queueId].owner = u
     /\ WaitSync(user, queueId)
     /\ userData[user] /= EMPTY => queueId \notin DOMAIN userData[user]
-    /\ userData' = [userData EXCEPT ![u][queueId].sync = @ \union {user},
+    /\ LET _userData == \* copy owner's fridj
+            [userData EXCEPT ![u][queueId].sync = @ \union {user},
                                     ![user] = [AddFridj(user, queueId, userData[u][queueId])
                                                 EXCEPT ![queueId].sync = @ \union {user}]]
+       IN userData' = IF msgs /= EMPTY /\ queueId \in DOMAIN msgs
+                      \* get previous changes when subcribing more than once
+                      THEN ReduceSeq(LAMBDA msg, acc: 
+                                        IF msg.changedBy = user /\ msg.type \in {SHOP, FRDJ}
+                                        THEN UpdateUserData(msg, user, acc)
+                                        ELSE acc,
+                                     msgs[queueId], _userData)
+                      ELSE _userData
     /\ IF userData[u][queueId].sync \ {userData[u][queueId].owner} /= {}
        THEN Send(queueId, <<Msg(msgId, user, userData[u][queueId].owner, SUB, queueId, {user})>>)
        ELSE UNCHANGED msgs
@@ -263,16 +279,11 @@ RcvMsg(user) == \E queueId \in Ids(user):
                     => user \notin msgsRcvd[msg.id]
           
           \* update user's data with new value
-          /\ userData' = CASE msg.type = FRDJ  -> [userData EXCEPT ![user][msg.frdjId].frdj = msg.val]
-                           [] msg.type = SHOP  -> [userData EXCEPT ![user][msg.frdjId].shop = msg.val]
-                           [] msg.type = CHOWN -> [userData EXCEPT ![user][msg.frdjId].owner = msg.val,
-                                                                   ![user][msg.frdjId].sync  = @ \ {user}]
-                           [] msg.type = SUB   -> [userData EXCEPT ![user][msg.frdjId].sync = @ \union msg.val]
-                           [] msg.type = UNSUB -> [userData EXCEPT ![user][msg.frdjId].sync = @ \ msg.val]
+          /\ userData' = UpdateUserData(msg, user, userData)
 
           \* ensure that all subscribed users receive the message
           /\ IF msgsRcvd = EMPTY
-             THEN IF subscribed = {user} \/ (Cardinality(subscribed) = 1 /\ msg.owner = user)
+             THEN IF {user} = (subscribed \union {msg.owner}) \ {msg.changedBy}
                   THEN /\ msgs' = [msgs EXCEPT ![queueId] = Tail(@)]
                        /\ UNCHANGED msgsRcvd
                   ELSE /\ msgsRcvd' = [mId \in {msg.id} |-> {user}]
@@ -281,7 +292,8 @@ RcvMsg(user) == \E queueId \in Ids(user):
              THEN /\ msgsRcvd' = [mId \in (DOMAIN msgsRcvd) \union {msg.id} |-> 
                                     IF mId = msg.id THEN {user} ELSE msgsRcvd[mId]]
                   /\ UNCHANGED msgs
-             ELSE IF msgsRcvd[msg.id] = subscribed \union {user}
+             ELSE IF msgsRcvd[msg.id] \union {user} = 
+                        (subscribed \ {msg.changedBy}) \union {msg.owner}
                   THEN /\ msgs' = [msgs EXCEPT ![queueId] = Tail(@)]
                        /\ msgsRcvd' = [mId \in (DOMAIN msgsRcvd) \ {msg.id} |-> 
                                         msgsRcvd[mId]]
@@ -418,6 +430,6 @@ UserDataIsSynchronized ==
 
 =============================================================================
 \* Modification History
-\* Last modified Sat Aug 24 18:47:47 CEST 2024 by Davd
+\* Last modified Sat Aug 24 20:39:48 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33
