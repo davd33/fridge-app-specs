@@ -30,9 +30,6 @@ vars == <<userData, msgs, msgsRcvd, operationsCount>>
 (***************************************************************************)
 SHOP == "shop" \* shopping list
 FRDJ == "frdj" \* fridj
-CHOWN == "chown" \* change owner
-SUB == "sub" \* user subscribe
-UNSUB == "unsub" \* user unsubscribe
 
 (***************************************************************************)
 (* Fridj Ids are uniq through all the users                                *)
@@ -70,27 +67,12 @@ Msgs(messages) == messages = EMPTY \/
     /\ DOMAIN messages \subseteq FRIDJ_IDS
     /\ \A queueId \in DOMAIN messages: 
         \/ messages[queueId] = <<>>
-        \/ ForAllSeq(LAMBDA m:
-                        IF m.type = CHOWN
-                        THEN m \in [changedBy: USERS,
-                                    id: MSG_IDS,
-                                    owner: USERS,
-                                    type: {CHOWN},
-                                    frdjId: FRIDJ_IDS,
-                                    val: USERS]
-                        ELSE IF m.type \in {SUB, UNSUB}
-                        THEN m \in [changedBy: USERS,
-                                    id: MSG_IDS,
-                                    owner: USERS,
-                                    type: {SUB, UNSUB},
-                                    frdjId: FRIDJ_IDS,
-                                    val: SUBSET USERS]
-                        ELSE m \in [changedBy: USERS,
-                                    id: MSG_IDS,
-                                    owner: USERS,
-                                    type: {FRDJ, SHOP},
-                                    frdjId: FRIDJ_IDS,
-                                    val: [INGREDIENT_TYPES -> Nat]],
+        \/ ForAllSeq(LAMBDA m: m \in [changedBy: USERS,
+                                      id: MSG_IDS,
+                                      owner: USERS,
+                                      type: {FRDJ, SHOP},
+                                      frdjId: FRIDJ_IDS,
+                                      val: [INGREDIENT_TYPES -> Nat]],
                      messages[queueId])
 
 MsgsRcvd == 
@@ -131,13 +113,6 @@ Send(queueId, new_msgs) ==
                 |-> IF mId = queueId THEN msgs[mId] \o new_msgs
                                      ELSE msgs[mId]]
 
-RangeMsgs(queueId) ==
-    IF msgs = EMPTY \/ queueId \notin DOMAIN msgs
-    THEN {}
-    ELSE Range(msgs[queueId])
-
-WaitSync(user, queueId) == \A m \in RangeMsgs(queueId): m.changedBy = user 
-
 (***************************************************************************)
 (* Actions taken by users.                                                 *)
 (* Create Fridj and shopping list!                                         *)
@@ -158,75 +133,68 @@ CreateFridj(user) ==
            userData' = [userData EXCEPT ![user] = AddFridj(user, id, NewFridj(user))]
     /\ UNCHANGED <<msgs, msgsRcvd>>
 
-DeleteFridj(user) == \E queueId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds:
-    /\ userData[user][queueId].owner = user
-    /\ WaitSync(user, queueId)
-    /\ userData' = [userData EXCEPT ![user] = [x \in Ids(user) \ {queueId} |-> @[x]]]
-    /\ IF userData[user][queueId].sync \ {userData[user][queueId].owner} /= {}
-       THEN Send(queueId, <<Msg(msgId, user, userData[user][queueId].owner, CHOWN, queueId, 
-                    CHOOSE newOwner \in userData[user][queueId].sync: newOwner /= user)>>)
-       ELSE UNCHANGED msgs
-    /\ UNCHANGED msgsRcvd
+DeleteFridj(user) == \E id \in Ids(user):
+    /\ userData[user][id].owner = user
+    /\ userData' = [userData EXCEPT ![user] = [x \in Ids(user) \ {id} |-> @[x]]]
+    /\ UNCHANGED <<msgs, msgsRcvd>>
 
-Subscribe(user) == \E u \in USERS \ {user}: \E queueId \in Ids(u), msgId \in MSG_IDS \ AllMsgsIds:
-    /\ userData[u][queueId].owner = u
-    /\ WaitSync(user, queueId)
-    /\ userData[user] /= EMPTY => queueId \notin DOMAIN userData[user]
-    /\ userData' = [userData EXCEPT ![u][queueId].sync = @ \union {user},
-                                    ![user] = [AddFridj(user, queueId, userData[u][queueId])
-                                                EXCEPT ![queueId].sync = @ \union {user}]]
-    /\ IF userData[u][queueId].sync \ {userData[u][queueId].owner} /= {}
-       THEN Send(queueId, <<Msg(msgId, user, userData[u][queueId].owner, SUB, queueId, {user})>>)
-       ELSE UNCHANGED msgs
-    /\ UNCHANGED msgsRcvd
+Subscribe(user) == \E u \in USERS \ {user}: \E id \in Ids(u):
+    /\ userData[u][id].owner = u
+    /\ userData[user] /= EMPTY => id \notin DOMAIN userData[user]
+    /\ userData' = [userData EXCEPT ![u][id].sync = @ \union {user},
+                                    ![user] = [AddFridj(user, id, userData[u][id])
+                                                EXCEPT ![id].sync = @ \union {user}]]
+    /\ UNCHANGED <<msgs, msgsRcvd>>
 
-Unsubscribe(user) == \E queueId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds:
-    /\ userData[user][queueId].owner /= user
-    /\ WaitSync(user, queueId)
+Unsubscribe(user) == \E id \in Ids(user):
+    /\ userData[user][id].owner /= user
     /\ userData' = [u \in USERS |->   
             IF u = user 
-            THEN [uid \in Ids(u) \ {queueId} |-> userData[u][uid]]
-            ELSE [uid \in Ids(u)             |-> userData[u][uid]]]
-    /\ IF \E u \in USERS \ {user}:
-                u \in userData[user][queueId].sync \union {userData[user][queueId].owner} 
-       THEN Send(queueId, <<Msg(msgId, user, userData[user][queueId].owner, UNSUB, queueId, {user})>>)
-       ELSE UNCHANGED msgs
-    /\ UNCHANGED msgsRcvd
+            THEN [uid \in Ids(u) \ {id} |-> userData[u][uid]]
+            ELSE [uid \in Ids(u)        |->
+                    [userData[u][uid] EXCEPT !.sync = 
+                       IF uid = id THEN @ \ {user}
+                                   ELSE @]]]
+    /\ UNCHANGED <<msgs, msgsRcvd>>
 
 (***************************************************************************)
 (* Add one item in one of its shopping lists.                              *)
 (***************************************************************************)
+RangeMsgs(fridjId) ==
+    IF msgs = EMPTY \/ fridjId \notin DOMAIN msgs
+    THEN {}
+    ELSE Range(msgs[fridjId])
+
 AddToShoppingList(user) ==
-    \E t \in INGREDIENT_TYPES, queueId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds:
-        /\ WaitSync(user, queueId)
+    \E t \in INGREDIENT_TYPES, fridjId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds:
+        /\ \A m \in RangeMsgs(fridjId): m.changedBy = user 
         /\ \* update users data with new shopping list
-           LET _userData == [userData EXCEPT ![user][queueId].shop[t] = @ + 1]
-               owner == userData[user][queueId].owner
+           LET _userData == [userData EXCEPT ![user][fridjId].shop[t] = @ + 1]
+               owner == userData[user][fridjId].owner
            IN /\ userData' = _userData
-              /\ IF \E u \in USERS \ {user}: 
-                        u \in userData[user][queueId].sync \union {owner}
-                 THEN Send(queueId, <<Msg(msgId, user, owner, SHOP, queueId, _userData[user][queueId].shop)>>)
-                 ELSE UNCHANGED msgs
+              /\ /\ userData[user][fridjId].sync /= {}
+                 /\ Send(fridjId, <<Msg(msgId, user, owner, SHOP, fridjId, _userData[user][fridjId].shop)>>)
               /\ UNCHANGED msgsRcvd
 
 (***************************************************************************)
 (* Next, users add bought items in their fridj instance.                   *)
 (***************************************************************************)
 BuyIngredients(user) == 
-    \E t \in INGREDIENT_TYPES, queueId \in Ids(user), 
+    \E t \in INGREDIENT_TYPES, fridjId \in Ids(user), 
        msgId1 \in MSG_IDS \ AllMsgsIds: \E msgId2 \in (MSG_IDS \ AllMsgsIds) \ {msgId1}:
-        /\ WaitSync(user, queueId)
+        \* Cannot change if I'm not in sync
+        /\ \A m \in RangeMsgs(fridjId): m.changedBy = user 
         /\ \* move elements of the shop list in the fridj
-           LET data == userData[user][queueId]
+           LET data == userData[user][fridjId]
                \* fridj accepts MAX_QTTY elements by ingredients
                bought_n == Min(MAX_QTTY - data.frdj[t], data.shop[t])
-               _userData == [userData EXCEPT ![user][queueId].shop[t] = @ - bought_n,
-                                             ![user][queueId].frdj[t] = @ + bought_n]
+               _userData == [userData EXCEPT ![user][fridjId].shop[t] = @ - bought_n,
+                                             ![user][fridjId].frdj[t] = @ + bought_n]
            IN /\ bought_n > 0
               /\ userData' = _userData
               /\ /\ data.sync /= {}
-                 /\ Send(queueId, <<Msg(msgId1, user, data.owner, SHOP, queueId, _userData[user][queueId].shop), 
-                                    Msg(msgId2, user, data.owner, FRDJ, queueId, _userData[user][queueId].frdj)>>)
+                 /\ Send(fridjId, <<Msg(msgId1, user, data.owner, SHOP, fridjId, _userData[user][fridjId].shop), 
+                                    Msg(msgId2, user, data.owner, FRDJ, fridjId, _userData[user][fridjId].frdj)>>)
               /\ UNCHANGED msgsRcvd
 
 (***************************************************************************)
@@ -236,16 +204,17 @@ AllRecipes ==
     [INGREDIENT_TYPES -> 0..MAX_QTTY] \ {[t \in INGREDIENT_TYPES |-> 0]}
 
 MakeRecipe(user) == 
-    \E r \in AllRecipes, queueId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds: 
-        /\ WaitSync(user, queueId)
+    \E r \in AllRecipes, fridjId \in Ids(user), msgId \in MSG_IDS \ AllMsgsIds: 
+        \* Cannot change if I'm not in sync
+        /\ \A m \in RangeMsgs(fridjId): m.changedBy = user 
         /\ \* removes elements from the fridj
-           LET _userData == [userData EXCEPT ![user][queueId].frdj = [t \in DOMAIN @ |-> @[t] - r[t]],
-                                             ![user][queueId].cnt = @ + 1]
-               owner == userData[user][queueId].owner
-           IN /\ \A t \in DOMAIN r: userData[user][queueId].frdj[t] >= r[t]
+           LET _userData == [userData EXCEPT ![user][fridjId].frdj = [t \in DOMAIN @ |-> @[t] - r[t]],
+                                             ![user][fridjId].cnt = @ + 1]
+               owner == userData[user][fridjId].owner
+           IN /\ \A t \in DOMAIN r: userData[user][fridjId].frdj[t] >= r[t]
               /\ userData' = _userData
-              /\ /\ userData[user][queueId].sync /= {}
-                 /\ Send(queueId, <<Msg(msgId, user, owner, FRDJ, queueId, _userData[user][queueId].frdj)>>)
+              /\ /\ userData[user][fridjId].sync /= {}
+                 /\ Send(fridjId, <<Msg(msgId, user, owner, FRDJ, fridjId, _userData[user][fridjId].frdj)>>)
               /\ UNCHANGED msgsRcvd
 
 (***************************************************************************)
@@ -259,20 +228,11 @@ RcvMsg(user) == \E queueId \in Ids(user):
     /\ LET msg == Head(msgs[queueId])
            subscribed == userData[user][queueId].sync
        IN /\ msg.changedBy /= user
-          /\ msgsRcvd /= EMPTY /\ msg.id \in DOMAIN msgsRcvd 
-                    => user \notin msgsRcvd[msg.id]
-          
-          \* update user's data with new value
-          /\ userData' = CASE msg.type = FRDJ  -> [userData EXCEPT ![user][msg.frdjId].frdj = msg.val]
-                           [] msg.type = SHOP  -> [userData EXCEPT ![user][msg.frdjId].shop = msg.val]
-                           [] msg.type = CHOWN -> [userData EXCEPT ![user][msg.frdjId].owner = msg.val,
-                                                                   ![user][msg.frdjId].sync  = @ \ {user}]
-                           [] msg.type = SUB   -> [userData EXCEPT ![user][msg.frdjId].sync = @ \union msg.val]
-                           [] msg.type = UNSUB -> [userData EXCEPT ![user][msg.frdjId].sync = @ \ msg.val]
-
-          \* ensure that all subscribed users receive the message
+          /\ user /= userData[user][queueId].owner
+          /\ userData' = CASE msg.type = FRDJ -> [userData EXCEPT ![user][msg.frdjId].frdj = msg.val]
+                           [] msg.type = SHOP -> [userData EXCEPT ![user][msg.frdjId].shop = msg.val]
           /\ IF msgsRcvd = EMPTY
-             THEN IF subscribed = {user} \/ (Cardinality(subscribed) = 1 /\ msg.owner = user)
+             THEN IF subscribed = {user}
                   THEN /\ msgs' = [msgs EXCEPT ![queueId] = Tail(@)]
                        /\ UNCHANGED msgsRcvd
                   ELSE /\ msgsRcvd' = [mId \in {msg.id} |-> {user}]
@@ -361,7 +321,7 @@ FairSpec ==
 (***************************************************************************)
 UserDataTypeOk == UserData(userData)   
 MsgsTypeOk == Msgs(msgs)
-MsgsRcvdTypeOk == msgsRcvd = EMPTY \/ msgsRcvd = <<>> \/ MsgsRcvd
+MsgsRcvdTypeOk == msgsRcvd = EMPTY \/ MsgsRcvd
 OperatorsCountTypeOk == operationsCount \in [Actions -> [USERS -> 0..MAX_OP_COUNT]]
 
 (***************************************************************************)
@@ -369,32 +329,9 @@ OperatorsCountTypeOk == operationsCount \in [Actions -> [USERS -> 0..MAX_OP_COUN
 (***************************************************************************)
 EmptyQueuesImplySynchedUsers ==
     \/ msgs = EMPTY  
-    \/ \A u1 \in USERS: \A queueId \in {i \in Ids(u1): userData[u1][i].sync /= {}}:
-          (msgs = EMPTY \/ (queueId \in DOMAIN msgs /\ msgs[queueId] = <<>>)) => 
-             (\A u2 \in userData[u1][queueId].sync: 
-                LET u1d == userData[u1][queueId] 
-                    u2d == userData[u2][queueId]
-                IN /\ u1d.frdj = u2d.frdj
-                   /\ u1d.shop = u2d.shop
-                   /\ u1d.sync = u2d.sync
-                   /\ u1d.owner = u2d.owner)
-
-NotSubscribedToDeletedFridj ==
-    \A u \in USERS:
-        \A queueId \in Ids(u):
-            LET owner == userData[u][queueId].owner
-            IN \/ /\ \/ queueId \in DOMAIN userData[owner]
-                     \/ \E msg \in RangeMsgs(queueId):
-                            /\ msg.owner = owner
-                            /\ msg.type = CHOWN
-                            /\ msg.changedBy = owner
-                            /\ msg.frdjId = queueId
-               \/ /\ msgs /= EMPTY
-                  /\ queueId \in DOMAIN msgs
-                  /\ \E msg \in RangeMsgs(queueId):
-                        /\ msg.type = CHOWN
-                        /\ msg.frdjId = queueId
-                        /\ msg.val \in userData[u][queueId].sync \ {owner}
+    \/ \A queueId \in AllIds:
+          (queueId \in DOMAIN msgs /\ msgs[queueId] = <<>>) => 
+             \A u1, u2 \in USERS: userData[u1][queueId] = userData[u2][queueId]
 
 (***************************************************************************)
 (* Compose liveness properties and invariants                              *)
@@ -402,7 +339,6 @@ NotSubscribedToDeletedFridj ==
 AllUsersMakeRecipes == \A u \in USERS: 
     <>( /\ Ids(u) /= {}
         /\ \A id \in Ids(u): userData[u][id].cnt > 0)
-
 FridjesCreated == \A u \in USERS: <>(userData[u] /= EMPTY)
 UserDataIsSynchronized ==
     /\ <>(\E u \in USERS: msgs[u] /= <<>>)
@@ -418,6 +354,6 @@ UserDataIsSynchronized ==
 
 =============================================================================
 \* Modification History
-\* Last modified Sat Aug 24 18:47:47 CEST 2024 by Davd
+\* Last modified Sat Aug 24 14:46:33 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33

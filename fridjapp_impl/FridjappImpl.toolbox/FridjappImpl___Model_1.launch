@@ -13,7 +13,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="13"/>
+    <intAttribute key="fpIndex" value="111"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -23,14 +23,15 @@
     <stringAttribute key="modelBehaviorSpec" value="FairSpec"/>
     <intAttribute key="modelBehaviorSpecType" value="1"/>
     <stringAttribute key="modelBehaviorVars" value="msgsRcvd, operationsCount, msgs, userData"/>
-    <stringAttribute key="modelComments" value=""/>
+    <stringAttribute key="modelComments" value="Safety Model"/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
-        <listEntry value="1NoMsgForUnsubscribedUser"/>
         <listEntry value="1UserDataTypeOk"/>
         <listEntry value="1MsgsTypeOk"/>
         <listEntry value="1MsgsRcvdTypeOk"/>
         <listEntry value="1OperatorsCountTypeOk"/>
+        <listEntry value="1EmptyQueuesImplySynchedUsers"/>
+        <listEntry value="1NotSubscribedToDeletedFridj"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties"/>
     <intAttribute key="modelEditorOpenTabs" value="14"/>
@@ -39,11 +40,11 @@
     <listAttribute key="modelParameterConstants">
         <listEntry value="INGREDIENT_TYPES;;{banana, orange};1;1"/>
         <listEntry value="MAX_QTTY;;3;0;0"/>
-        <listEntry value="USERS;;{davd, mj};1;1"/>
+        <listEntry value="USERS;;{davd, mj, luk};1;1"/>
         <listEntry value="EMPTY;;EMPTY;1;0"/>
-        <listEntry value="FRIDJ_IDS;;{a, b};1;1"/>
-        <listEntry value="MSG_IDS;;{d, e};1;1"/>
-        <listEntry value="MAX_OP_COUNT;;3;0;0"/>
+        <listEntry value="FRIDJ_IDS;;{a, b, c};1;1"/>
+        <listEntry value="MSG_IDS;;{d, e, f};1;1"/>
+        <listEntry value="MAX_OP_COUNT;;30;0;0"/>
     </listAttribute>
     <stringAttribute key="modelParameterContraint" value=""/>
     <listAttribute key="modelParameterDefinitions"/>
@@ -61,7 +62,8 @@
     <stringAttribute key="specName" value="FridjappImpl"/>
     <stringAttribute key="tlcResourcesProfile" value="local custom"/>
     <listAttribute key="traceExploreExpressions">
-        <listEntry value="1MAX_OP_COUNT"/>
+        <listEntry value="1AllIds"/>
+        <listEntry value="1USERS"/>
     </listAttribute>
     <stringAttribute key="view" value=""/>
     <booleanAttribute key="visualizeStateGraph" value="false"/>

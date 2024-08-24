@@ -8,54 +8,54 @@ banana, orange
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-davd, mj
+davd, mj, luk
 ----
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-a, b
+a, b, c
 ----
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-d, e
+d, e, f
 ----
 
 \* MV CONSTANT definitions INGREDIENT_TYPES
-const_17243997253111174000 == 
+const_1724518096497957000 == 
 {banana, orange}
 ----
 
 \* MV CONSTANT definitions USERS
-const_17243997253111175000 == 
-{davd, mj}
+const_1724518096497958000 == 
+{davd, mj, luk}
 ----
 
 \* MV CONSTANT definitions FRIDJ_IDS
-const_17243997253111176000 == 
-{a, b}
+const_1724518096497959000 == 
+{a, b, c}
 ----
 
 \* MV CONSTANT definitions MSG_IDS
-const_17243997253111177000 == 
-{d, e}
+const_1724518096497960000 == 
+{d, e, f}
 ----
 
 \* SYMMETRY definition
-symm_17243997253111178000 == 
-Permutations(const_17243997253111174000) \union Permutations(const_17243997253111175000) \union Permutations(const_17243997253111176000) \union Permutations(const_17243997253111177000)
+symm_1724518096497961000 == 
+Permutations(const_1724518096497957000) \union Permutations(const_1724518096497958000) \union Permutations(const_1724518096497959000) \union Permutations(const_1724518096497960000)
 ----
 
 \* CONSTANT definitions @modelParameterConstants:1MAX_QTTY
-const_17243997253111179000 == 
+const_1724518096497962000 == 
 3
 ----
 
 \* CONSTANT definitions @modelParameterConstants:6MAX_OP_COUNT
-const_17243997253111180000 == 
-3
+const_1724518096497963000 == 
+30
 ----
 
 =============================================================================
 \* Modification History
-\* Created Fri Aug 23 09:55:25 CEST 2024 by Davd
+\* Created Sat Aug 24 18:48:16 CEST 2024 by Davd
