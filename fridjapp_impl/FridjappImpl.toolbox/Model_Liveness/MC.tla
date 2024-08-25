@@ -18,39 +18,39 @@ d, e, f
 
 \* MV CONSTANT declarations@modelParameterConstants
 CONSTANTS
-davd, mj, luk
+davd, mj
 ----
 
 \* MV CONSTANT definitions INGREDIENT_TYPES
-const_1724504225828221000 == 
+const_1724602894557294000 == 
 {banana, orange}
 ----
 
 \* MV CONSTANT definitions MSG_IDS
-const_1724504225828222000 == 
+const_1724602894557295000 == 
 {a, b, c}
 ----
 
 \* MV CONSTANT definitions FRIDJ_IDS
-const_1724504225828223000 == 
+const_1724602894557296000 == 
 {d, e, f}
 ----
 
 \* MV CONSTANT definitions USERS
-const_1724504225828224000 == 
-{davd, mj, luk}
+const_1724602894557297000 == 
+{davd, mj}
 ----
 
 \* CONSTANT definitions @modelParameterConstants:3MAX_QTTY
-const_1724504225828225000 == 
+const_1724602894557298000 == 
 3
 ----
 
 \* CONSTANT definitions @modelParameterConstants:5MAX_OP_COUNT
-const_1724504225828226000 == 
-30
+const_1724602894557299000 == 
+3
 ----
 
 =============================================================================
 \* Modification History
-\* Created Sat Aug 24 14:57:05 CEST 2024 by Davd
+\* Created Sun Aug 25 18:21:34 CEST 2024 by Davd

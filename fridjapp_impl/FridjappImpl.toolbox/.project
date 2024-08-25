@@ -23,7 +23,7 @@
 		<link>
 			<name>fridjapp.tla</name>
 			<type>1</type>
-			<location>/home/davd33/Code/fridjapp-specs/fridjapp_impl/fridjapp.tla</location>
+			<locationURI>PARENT-1-PROJECT_LOC/fridjapp.tla</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

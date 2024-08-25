@@ -319,35 +319,61 @@ GetActionFormula(actionName, user) ==
       [] actionName = "CreateFridj" -> CreateFridj(user)
       [] actionName = "DeleteFridj" -> DeleteFridj(user)
       [] actionName = "Subscribe" -> Subscribe(user)
-      
-RunAction(action, user) ==
-    IF operationsCount[action][user] = MAX_OP_COUNT
-    THEN UNCHANGED vars
-    ELSE /\ GetActionFormula(action, user)
-         /\ operationsCount' = [operationsCount EXCEPT ![action][user] = @ + 1]
 
-A_Unsubscribe(u) == RunAction("Unsubscribe", u)
-A_AddToShoppingList(u) == RunAction("AddToShoppingList", u)
-A_BuyIngredients(u) == RunAction("BuyIngredients", u)
-A_MakeRecipe(u) == RunAction("MakeRecipe", u)
-A_RcvMsg(u) == RunAction("RcvMsg", u)
-A_CreateFridj(u) == RunAction("CreateFridj", u)
-A_DeleteFridj(u) == RunAction("DeleteFridj", u)
-A_Subscribe(u) == RunAction("Subscribe", u)
+A_Unsubscribe(u) ==
+    IF operationsCount["Unsubscribe"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("Unsubscribe", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["Unsubscribe"][u] = @ + 1]
+A_AddToShoppingList(u) ==
+    IF operationsCount["AddToShoppingList"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("AddToShoppingList", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["AddToShoppingList"][u] = @ + 1]
+A_BuyIngredients(u) ==
+    IF operationsCount["BuyIngredients"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("BuyIngredients", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["BuyIngredients"][u] = @ + 1]
+A_MakeRecipe(u) ==
+    IF operationsCount["MakeRecipe"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("MakeRecipe", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["MakeRecipe"][u] = @ + 1]
+A_RcvMsg(u) ==
+    IF operationsCount["RcvMsg"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("RcvMsg", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["RcvMsg"][u] = @ + 1]
+A_CreateFridj(u) ==
+    IF operationsCount["CreateFridj"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("CreateFridj", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["CreateFridj"][u] = @ + 1]
+A_DeleteFridj(u) ==
+    IF operationsCount["DeleteFridj"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("DeleteFridj", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["DeleteFridj"][u] = @ + 1]
+A_Subscribe(u) ==
+    IF operationsCount["Subscribe"][u] = MAX_OP_COUNT
+    THEN UNCHANGED vars
+    ELSE /\ GetActionFormula("Subscribe", u)
+         /\ operationsCount' = [operationsCount EXCEPT !["Subscribe"][u] = @ + 1]
 
 (***************************************************************************)
 (* Specification compilation of all state predicates.                      *)
 (***************************************************************************)
 Next == 
     \E u \in USERS:
-        \/ A_Subscribe(u)
-        \/ A_Unsubscribe(u)
-        \/ A_AddToShoppingList(u)
-        \/ A_BuyIngredients(u)
-        \/ A_MakeRecipe(u)
-        \/ A_RcvMsg(u)
-        \/ A_CreateFridj(u)
-        \/ A_DeleteFridj(u)
+        \/ A_Subscribe(u) \* copy data over (from owner's client to U)
+        \/ A_Unsubscribe(u) \* send UNSUB message over the queue
+        \/ A_AddToShoppingList(u) \* send msg
+        \/ A_BuyIngredients(u) \* send msg
+        \/ A_MakeRecipe(u) \* send msg
+        \/ A_RcvMsg(u) \* read from msg queue
+        \/ A_CreateFridj(u) \* local
+        \/ A_DeleteFridj(u) \* send CHOWN msg if subscribed users
 
 Init == 
     /\ operationsCount = [a \in Actions |-> [u \in USERS |-> 0]]
@@ -370,7 +396,7 @@ FairSpec ==
         /\ SF_vars(A_BuyIngredients(u))
         /\ SF_vars(A_MakeRecipe(u))
         /\ SF_vars(A_AddToShoppingList(u))
-        /\ SF_vars(A_RcvMsg(u))
+        /\ WF_vars(A_RcvMsg(u))
 
 (***************************************************************************)
 (* Type checking invariants.                                                *)
@@ -416,25 +442,13 @@ NotSubscribedToDeletedFridj ==
 (***************************************************************************)
 (* Compose liveness properties and invariants                              *)
 (***************************************************************************)
-AllUsersMakeRecipes == \A u \in USERS: 
-    <>( /\ Ids(u) /= {}
-        /\ \A id \in Ids(u): userData[u][id].cnt > 0)
-
-FridjesCreated == \A u \in USERS: <>(userData[u] /= EMPTY)
-UserDataIsSynchronized ==
-    /\ <>(\E u \in USERS: msgs[u] /= <<>>)
-    \* messages are sent and received
-    /\ \A u \in USERS: msgs[u] /= <<>> ~> msgs[u] = <<>>
-    \* user data is coherent through all subscribed users
-    /\ \A id \in AllIds: \E owner \in USERS: 
-        /\ userData[owner][id].owner = owner
-        /\ \A u \in USERS \ {owner}:
-            /\ u \in userData[owner][id].sync
-            /\ userData[u][id].frdj = userData[owner][id].frdj
-            /\ userData[u][id].shop = userData[owner][id].shop
+MsgsAreConsumed == 
+    \A queueId \in FRIDJ_IDS: 
+         (msgs /= EMPTY /\ queueId \in DOMAIN msgs /\ msgs[queueId] /= <<>>)
+             ~> (msgs /= EMPTY /\ queueId \in DOMAIN msgs /\ msgs[queueId] = <<>>)
 
 =============================================================================
 \* Modification History
-\* Last modified Sun Aug 25 13:52:05 CEST 2024 by Davd
+\* Last modified Sun Aug 25 16:53:57 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33
