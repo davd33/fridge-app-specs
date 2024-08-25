@@ -13,7 +13,7 @@
     <stringAttribute key="distributedTLC" value="off"/>
     <stringAttribute key="distributedTLCVMArgs" value=""/>
     <intAttribute key="fpBits" value="1"/>
-    <intAttribute key="fpIndex" value="111"/>
+    <intAttribute key="fpIndex" value="21"/>
     <booleanAttribute key="fpIndexRandom" value="true"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <intAttribute key="maxSetSize" value="1000000"/>
@@ -44,7 +44,7 @@
         <listEntry value="EMPTY;;EMPTY;1;0"/>
         <listEntry value="FRIDJ_IDS;;{a, b, c};1;1"/>
         <listEntry value="MSG_IDS;;{d, e, f};1;1"/>
-        <listEntry value="MAX_OP_COUNT;;30;0;0"/>
+        <listEntry value="MAX_OP_COUNT;;3;0;0"/>
     </listAttribute>
     <stringAttribute key="modelParameterContraint" value=""/>
     <listAttribute key="modelParameterDefinitions"/>

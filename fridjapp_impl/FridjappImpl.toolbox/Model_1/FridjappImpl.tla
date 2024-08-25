@@ -192,6 +192,7 @@ Subscribe(user) == \E u \in USERS \ {user}: \E queueId \in Ids(u), msgId \in MSG
                                      msgs[queueId], _userData)
                       ELSE _userData
     /\ IF userData[u][queueId].sync \ {userData[u][queueId].owner} /= {}
+           \/ \E m \in RangeMsgs(queueId): m.changedBy = user
        THEN Send(queueId, <<Msg(msgId, user, userData[u][queueId].owner, SUB, queueId, {user})>>)
        ELSE UNCHANGED msgs
     /\ UNCHANGED msgsRcvd
@@ -289,9 +290,12 @@ RcvMsg(user) == \E queueId \in Ids(user):
                   ELSE /\ msgsRcvd' = [mId \in {msg.id} |-> {user}]
                        /\ UNCHANGED msgs
              ELSE IF msg.id \notin DOMAIN msgsRcvd
-             THEN /\ msgsRcvd' = [mId \in (DOMAIN msgsRcvd) \union {msg.id} |-> 
-                                    IF mId = msg.id THEN {user} ELSE msgsRcvd[mId]]
-                  /\ UNCHANGED msgs
+             THEN IF {user} = (subscribed \union {msg.owner}) \ {msg.changedBy}
+                  THEN /\ msgs' = [msgs EXCEPT ![queueId] = Tail(@)]
+                       /\ UNCHANGED msgsRcvd
+                  ELSE /\ msgsRcvd' = [mId \in (DOMAIN msgsRcvd) \union {msg.id} |-> 
+                                          IF mId = msg.id THEN {user} ELSE msgsRcvd[mId]]
+                       /\ UNCHANGED msgs
              ELSE IF msgsRcvd[msg.id] \union {user} = 
                         (subscribed \ {msg.changedBy}) \union {msg.owner}
                   THEN /\ msgs' = [msgs EXCEPT ![queueId] = Tail(@)]
@@ -382,7 +386,7 @@ OperatorsCountTypeOk == operationsCount \in [Actions -> [USERS -> 0..MAX_OP_COUN
 EmptyQueuesImplySynchedUsers ==
     \/ msgs = EMPTY  
     \/ \A u1 \in USERS: \A queueId \in {i \in Ids(u1): userData[u1][i].sync /= {}}:
-          (msgs = EMPTY \/ (queueId \in DOMAIN msgs /\ msgs[queueId] = <<>>)) => 
+          (queueId \in DOMAIN msgs /\ msgs[queueId] = <<>>) => 
              (\A u2 \in userData[u1][queueId].sync: 
                 LET u1d == userData[u1][queueId] 
                     u2d == userData[u2][queueId]
@@ -395,12 +399,13 @@ NotSubscribedToDeletedFridj ==
     \A u \in USERS:
         \A queueId \in Ids(u):
             LET owner == userData[u][queueId].owner
-            IN \/ /\ \/ queueId \in DOMAIN userData[owner]
-                     \/ \E msg \in RangeMsgs(queueId):
-                            /\ msg.owner = owner
-                            /\ msg.type = CHOWN
-                            /\ msg.changedBy = owner
-                            /\ msg.frdjId = queueId
+            IN \/ \/ queueId \in DOMAIN userData[owner]
+                  \/ \E msg \in RangeMsgs(queueId):
+                         /\ msg.owner = owner
+                         /\ msg.type = CHOWN
+                         /\ msg.changedBy = owner
+                         /\ msg.frdjId = queueId
+                         /\ msg.val \in userData[u][queueId].sync \ {owner}
                \/ /\ msgs /= EMPTY
                   /\ queueId \in DOMAIN msgs
                   /\ \E msg \in RangeMsgs(queueId):
@@ -430,6 +435,6 @@ UserDataIsSynchronized ==
 
 =============================================================================
 \* Modification History
-\* Last modified Sat Aug 24 20:39:48 CEST 2024 by Davd
+\* Last modified Sun Aug 25 13:52:05 CEST 2024 by Davd
 \* Last modified Mon Aug 05 09:55:47 CEST 2024 by davd33
 \* Created Thu Jul 25 23:17:45 CEST 2024 by davd33

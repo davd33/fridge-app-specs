@@ -1,1 +1,6 @@
 #+TITLE: fridge-app-specs
+
+* TLA spec
+
+The spec allowed for to make the synchronization process right as well as to
+define the App's variables and authorized behaviors.
